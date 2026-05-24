@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Helpdesk Ticketing System - UI Wireframes</title>
+  <style>
+    :root {
+      --ink: #182033;
+      --muted: #657084;
+      --line: #d9e0ea;
+      --soft: #f5f7fb;
+      --panel: #ffffff;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --teal: #0f766e;
+      --teal-soft: #e7f6f4;
+      --amber: #b45309;
+      --amber-soft: #fff7ed;
+      --red: #b91c1c;
+      --red-soft: #fef2f2;
+      --slate-soft: #eef2f7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--soft);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 20px 28px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .brand p,
+    .team p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .team {
+      text-align: right;
+      font-size: 14px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 83px;
+      min-height: calc(100vh - 83px);
+      padding: 18px;
+      background: #ffffff;
+      border-right: 1px solid var(--line);
+    }
+
+    .sidebar h2 {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .nav-link {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .nav-link:hover {
+      background: #f8fbff;
+      border-color: #cbd9ff;
+    }
+
+    .nav-number {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .review-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .review-card strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 7px;
+    }
+
+    .content {
+      padding: 24px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .screen {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(24, 32, 51, 0.07);
+    }
+
+    .screen-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcff;
+    }
+
+    .screen-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .screen-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: #c9d8ff;
+    }
+
+    .pill.teal {
+      background: var(--teal-soft);
+      color: var(--teal);
+      border-color: #b9e7df;
+    }
+
+    .pill.amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: #fed7aa;
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: #fecaca;
+    }
+
+    .screen-body {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .component-map {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .map-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      min-height: 62px;
+    }
+
+    .map-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .map-item strong {
+      display: block;
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    .mock-browser {
+      border: 1px solid #cfd8e6;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .mock-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #b9c3d3;
+    }
+
+    .mock-url {
+      flex: 1;
+      min-height: 24px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #ffffff;
+      font-size: 12px;
+    }
+
+    .app-frame {
+      min-height: 430px;
+      background: #ffffff;
+    }
+
+    .auth-layout {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      min-height: 430px;
+      background: #f8fafc;
+    }
+
+    .auth-hero {
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: 42px;
+      background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.08)),
+        #f8fafc;
+    }
+
+    .auth-hero h3 {
+      margin: 0;
+      max-width: 520px;
+      font-size: 32px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .auth-hero p {
+      margin: 0;
+      max-width: 500px;
+      color: var(--muted);
+    }
+
+    .auth-panel {
+      display: grid;
+      align-content: center;
+      gap: 14px;
+      padding: 34px;
+      border-left: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .input,
+    .textarea,
+    .select-box {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .textarea {
+      min-height: 112px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 9px 14px;
+      border: 1px solid var(--blue);
+      border-radius: 8px;
+      background: var(--blue);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .button.secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border-color: #c9d8ff;
+    }
+
+    .button.quiet {
+      background: #ffffff;
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      min-height: 430px;
+    }
+
+    .top-navigation {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .product-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 700;
+    }
+
+    .mini-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #ffffff;
+      font-size: 12px;
+    }
+
+    .search {
+      width: min(320px, 100%);
+      min-height: 36px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .role-sidebar {
+      padding: 14px;
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+    }
+
+    .side-link {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .side-link.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .main-panel {
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .page-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .page-title-row h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .page-title-row p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(115px, 1fr));
+      gap: 12px;
+    }
+
+    .summary-card {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      background: #fbfcff;
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status,
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.open {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .status.progress,
+    .status.active {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .status.pending {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .status.closed {
+      background: var(--slate-soft);
+      color: #475569;
+    }
+
+    .priority.high,
+    .priority.critical {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .priority.medium {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .priority.low {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .dropzone {
+      min-height: 74px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed #aebbd0;
+      border-radius: 8px;
+      background: #fbfcff;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 14px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcff;
+    }
+
+    .panel-title h4 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .message {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      font-size: 13px;
+    }
+
+    .message.internal {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .message strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .property-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .property-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .property-row span {
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .timeline-dot {
+      width: 10px;
+      height: 10px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .queue-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 16px;
+    }
+
+    .workload-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .workload-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      font-size: 13px;
+    }
+
+    .workload-item strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav-list {
+        grid-template-columns: repeat(3, minmax(170px, 1fr));
+      }
+
+      .component-map,
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .auth-layout,
+      .app-shell,
+      .detail-grid,
+      .queue-layout,
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-navigation {
+        grid-column: auto;
+      }
+
+      .auth-panel,
+      .role-sidebar {
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .masthead,
+      .screen-header {
+        grid-template-columns: 1fr;
+      }
+
+      .team {
+        text-align: left;
+      }
+
+      .content {
+        padding: 14px;
+      }
+
+      .nav-list,
+      .component-map,
+      .summary-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-navigation,
+      .page-title-row,
+      .button-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      th:nth-child(4),
+      td:nth-child(4),
+      th:nth-child(5),
+      td:nth-child(5) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="brand">
+        <div class="brand-mark">IT</div>
+        <div>
+          <h1>IT Helpdesk Ticketing System</h1>
+          <p>Assignment 1 UI wireframes with React page and component names</p>
+        </div>
+      </div>
+      <div class="team">
+        <strong>Issam Fawaz and Adam Diab</strong>
+        <p>React.js + ASP.NET Core Web API + PostgreSQL</p>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <h2>Review Screens</h2>
+        <nav class="nav-list" aria-label="Wireframe navigation">
+          <a class="nav-link" href="#auth-login"><span class="nav-number">1</span><span>AuthLoginPage</span></a>
+          <a class="nav-link" href="#employee-list"><span class="nav-number">2</span><span>EmployeeTicketListPage</span></a>
+          <a class="nav-link" href="#ticket-create"><span class="nav-number">3</span><span>TicketCreatePage</span></a>
+          <a class="nav-link" href="#ticket-detail"><span class="nav-number">4</span><span>TicketDetailPage</span></a>
+          <a class="nav-link" href="#agent-queue"><span class="nav-number">5</span><span>AgentQueuePage</span></a>
+          <a class="nav-link" href="#manager-reports"><span class="nav-number">6</span><span>ManagerReportsPage</span></a>
+          <a class="nav-link" href="#notifications"><span class="nav-number">7</span><span>NotificationsPage</span></a>
+          <a class="nav-link" href="#admin-console"><span class="nav-number">8</span><span>AdminConsolePage</span></a>
+        </nav>
+        <div class="review-card">
+          <strong>Instructor note</strong>
+          Screen names match the proposed React pages. Shared UI pieces are named so the frontend structure is clear before coding.
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="screen" id="auth-login">
+          <div class="screen-header">
+            <div>
+              <h2>1. Login</h2>
+              <p>Entry point for employees, support agents, managers, and admins.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /login</span>
+              <span class="pill teal">Page: AuthLoginPage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Layout</span><strong>AuthLayout</strong></div>
+              <div class="map-item"><span>Form</span><strong>LoginForm</strong></div>
+              <div class="map-item"><span>Inputs</span><strong>TextInput, PasswordInput</strong></div>
+              <div class="map-item"><span>Action</span><strong>PrimaryButton</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/login</span>
+              </div>
+              <div class="app-frame auth-layout" data-component="AuthLoginPage">
+                <div class="auth-hero" data-component="AuthLayout">
+                  <span class="pill blue">IT Helpdesk</span>
+                  <h3>One place to report IT problems and follow the fix.</h3>
+                  <p>This screen keeps the first interaction simple. Users sign in, and the system sends them to the correct dashboard based on role.</p>
+                </div>
+                <div class="auth-panel" data-component="LoginForm">
+                  <h3>Sign in</h3>
+                  <div class="field">
+                    <label>Email address</label>
+                    <div class="input">issam.fawaz@company.com</div>
+                  </div>
+                  <div class="field">
+                    <label>Password</label>
+                    <div class="input">********</div>
+                  </div>
+                  <div class="button">Sign in</div>
+                  <div class="button secondary">Request account access</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="employee-list">
+          <div class="screen-header">
+            <div>
+              <h2>2. Employee Ticket List</h2>
+              <p>Employee view for tracking submitted support requests.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /employee/tickets</span>
+              <span class="pill teal">Page: EmployeeTicketListPage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Layout</span><strong>AppShell</strong></div>
+              <div class="map-item"><span>Navigation</span><strong>RoleSidebar, TopNavigation</strong></div>
+              <div class="map-item"><span>Summary</span><strong>TicketSummaryCards</strong></div>
+              <div class="map-item"><span>List</span><strong>TicketFilters, TicketTable</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/employee/tickets</span>
+              </div>
+              <div class="app-frame app-shell" data-component="EmployeeTicketListPage">
+                <header class="top-navigation" data-component="TopNavigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>My Tickets</span></div>
+                  <div class="search">Search by ticket number, title, or category</div>
+                  <span class="pill blue">Employee</span>
+                </header>
+                <aside class="role-sidebar" data-component="RoleSidebar">
+                  <div class="side-link active">My tickets</div>
+                  <div class="side-link">Create ticket</div>
+                  <div class="side-link">Knowledge base</div>
+                  <div class="side-link">Profile</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="page-title-row">
+                    <div>
+                      <h3>Submitted tickets</h3>
+                      <p>Latest tickets opened by the signed-in employee.</p>
+                    </div>
+                    <div class="button">New ticket</div>
+                  </div>
+                  <div class="summary-grid" data-component="TicketSummaryCards">
+                    <div class="summary-card"><strong>4</strong><span>Open</span></div>
+                    <div class="summary-card"><strong>2</strong><span>In progress</span></div>
+                    <div class="summary-card"><strong>1</strong><span>Pending</span></div>
+                    <div class="summary-card"><strong>13</strong><span>Closed</span></div>
+                  </div>
+                  <div class="button-row" data-component="TicketFilters">
+                    <div class="filters">
+                      <span class="filter-chip">Status: All</span>
+                      <span class="filter-chip">Priority: All</span>
+                      <span class="filter-chip">Sort: Newest</span>
+                    </div>
+                  </div>
+                  <table data-component="TicketTable">
+                    <thead>
+                      <tr>
+                        <th>Ticket</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>#1042</td>
+                        <td>Laptop cannot connect to office Wi-Fi</td>
+                        <td><span class="status progress">In Progress</span></td>
+                        <td><span class="priority high">High</span></td>
+                        <td>Today</td>
+                      </tr>
+                      <tr>
+                        <td>#1038</td>
+                        <td>Email password reset request</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td><span class="priority medium">Medium</span></td>
+                        <td>Yesterday</td>
+                      </tr>
+                      <tr>
+                        <td>#1025</td>
+                        <td>Install approved design software</td>
+                        <td><span class="status closed">Closed</span></td>
+                        <td><span class="priority low">Low</span></td>
+                        <td>May 20</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="ticket-create">
+          <div class="screen-header">
+            <div>
+              <h2>3. Create Ticket</h2>
+              <p>Form for employees to submit enough information for support to start.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /employee/tickets/new</span>
+              <span class="pill teal">Page: TicketCreatePage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Form</span><strong>TicketCreateForm</strong></div>
+              <div class="map-item"><span>Selects</span><strong>CategorySelect, PrioritySelect</strong></div>
+              <div class="map-item"><span>Upload</span><strong>AttachmentDropzone</strong></div>
+              <div class="map-item"><span>Footer</span><strong>FormActions</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/employee/tickets/new</span>
+              </div>
+              <div class="app-frame app-shell" data-component="TicketCreatePage">
+                <header class="top-navigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>Create Ticket</span></div>
+                  <span class="pill blue">Employee</span>
+                </header>
+                <aside class="role-sidebar">
+                  <div class="side-link">My tickets</div>
+                  <div class="side-link active">Create ticket</div>
+                  <div class="side-link">Knowledge base</div>
+                  <div class="side-link">Profile</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="page-title-row">
+                    <div>
+                      <h3>New support request</h3>
+                      <p>Clear title, category, and description reduce back-and-forth later.</p>
+                    </div>
+                  </div>
+                  <div class="form-grid" data-component="TicketCreateForm">
+                    <div class="field wide">
+                      <label>Ticket title</label>
+                      <div class="input">Laptop cannot connect to office Wi-Fi</div>
+                    </div>
+                    <div class="field" data-component="CategorySelect">
+                      <label>Category</label>
+                      <div class="select-box">Network</div>
+                    </div>
+                    <div class="field" data-component="PrioritySelect">
+                      <label>Priority</label>
+                      <div class="select-box">High</div>
+                    </div>
+                    <div class="field wide">
+                      <label>Description</label>
+                      <div class="textarea">I moved to the second floor this morning. My laptop sees the office Wi-Fi but cannot connect. Other users near me are connected.</div>
+                    </div>
+                    <div class="field wide" data-component="AttachmentDropzone">
+                      <label>Attachment</label>
+                      <div class="dropzone">Drag a screenshot here or choose a file</div>
+                    </div>
+                  </div>
+                  <div class="button-row" data-component="FormActions">
+                    <div class="filters">
+                      <span class="button quiet">Cancel</span>
+                      <span class="button secondary">Save draft</span>
+                    </div>
+                    <span class="button">Submit ticket</span>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="ticket-detail">
+          <div class="screen-header">
+            <div>
+              <h2>4. Ticket Detail</h2>
+              <p>Shared detail page used by employees, agents, managers, and admins with role-based actions.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /tickets/:ticketId</span>
+              <span class="pill teal">Page: TicketDetailPage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Header</span><strong>TicketHeader</strong></div>
+              <div class="map-item"><span>Conversation</span><strong>TicketThread, CommentComposer</strong></div>
+              <div class="map-item"><span>Side panel</span><strong>TicketPropertiesPanel</strong></div>
+              <div class="map-item"><span>History</span><strong>ActivityTimeline</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/tickets/1042</span>
+              </div>
+              <div class="app-frame app-shell" data-component="TicketDetailPage">
+                <header class="top-navigation" data-component="TicketHeader">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>#1042 Laptop cannot connect to office Wi-Fi</span></div>
+                  <div class="pill-row">
+                    <span class="status progress">In Progress</span>
+                    <span class="priority high">High</span>
+                  </div>
+                </header>
+                <aside class="role-sidebar">
+                  <div class="side-link">Assigned to me</div>
+                  <div class="side-link active">Ticket detail</div>
+                  <div class="side-link">Unassigned queue</div>
+                  <div class="side-link">Reports</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="detail-grid">
+                    <div class="panel">
+                      <div class="panel-title">
+                        <h4>Conversation</h4>
+                        <span class="pill amber">Public + internal notes</span>
+                      </div>
+                      <div class="panel-body" data-component="TicketThread">
+                        <div class="message">
+                          <strong>Issam Fawaz, employee</strong>
+                          I restarted the laptop and forgot/rejoined the network. It still says "Cannot connect".
+                        </div>
+                        <div class="message internal">
+                          <strong>Adam Diab, internal note</strong>
+                          Check device profile and MAC filtering before replacing the adapter.
+                        </div>
+                        <div class="message">
+                          <strong>Adam Diab, support agent</strong>
+                          I am checking the device network profile. Please keep the laptop powered on for the next 15 minutes.
+                        </div>
+                        <div class="field" data-component="CommentComposer">
+                          <label>Add reply</label>
+                          <div class="textarea">Write a public reply or switch to internal note...</div>
+                        </div>
+                        <div class="button-row">
+                          <div class="filters">
+                            <span class="button quiet">Attach file</span>
+                            <span class="button secondary">Internal note</span>
+                          </div>
+                          <span class="button">Post update</span>
+                        </div>
+                      </div>
+                    </div>
+                    <aside class="panel" data-component="TicketPropertiesPanel">
+                      <div class="panel-title">
+                        <h4>Properties</h4>
+                      </div>
+                      <div class="panel-body">
+                        <div class="property-list">
+                          <div class="property-row"><span>Employee</span><strong>Issam Fawaz</strong></div>
+                          <div class="property-row"><span>Assigned to</span><strong>Adam Diab</strong></div>
+                          <div class="property-row"><span>Team</span><strong>Network Team</strong></div>
+                          <div class="property-row"><span>Category</span><strong>Network</strong></div>
+                          <div class="property-row"><span>Created</span><strong>May 24</strong></div>
+                        </div>
+                        <div class="timeline" data-component="ActivityTimeline">
+                          <div class="timeline-row"><span class="timeline-dot"></span><span>Ticket created by employee</span></div>
+                          <div class="timeline-row"><span class="timeline-dot"></span><span>Assigned to Network Team</span></div>
+                          <div class="timeline-row"><span class="timeline-dot"></span><span>Status changed to In Progress</span></div>
+                        </div>
+                      </div>
+                    </aside>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="agent-queue">
+          <div class="screen-header">
+            <div>
+              <h2>5. Agent Queue</h2>
+              <p>Support agent workspace for deciding what needs attention first.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /agent/queue</span>
+              <span class="pill teal">Page: AgentQueuePage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Tabs</span><strong>AgentQueueTabs</strong></div>
+              <div class="map-item"><span>Summary</span><strong>AgentWorkloadSummary</strong></div>
+              <div class="map-item"><span>List</span><strong>TicketTable</strong></div>
+              <div class="map-item"><span>Actions</span><strong>QuickActionButton</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/agent/queue</span>
+              </div>
+              <div class="app-frame app-shell" data-component="AgentQueuePage">
+                <header class="top-navigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>Agent Queue</span></div>
+                  <div class="search">Search assigned tickets</div>
+                  <span class="pill teal">Support Agent</span>
+                </header>
+                <aside class="role-sidebar" data-component="AgentQueueTabs">
+                  <div class="side-link active">Assigned to me</div>
+                  <div class="side-link">Unassigned queue</div>
+                  <div class="side-link">Critical</div>
+                  <div class="side-link">Pending</div>
+                  <div class="side-link">Reports</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="queue-layout">
+                    <div>
+                      <div class="page-title-row">
+                        <div>
+                          <h3>Assigned work</h3>
+                          <p>Sorted by urgency and last update.</p>
+                        </div>
+                        <div class="filters">
+                          <span class="filter-chip">Status: Open + In Progress</span>
+                          <span class="filter-chip">Sort: Priority</span>
+                        </div>
+                      </div>
+                      <table data-component="TicketTable">
+                        <thead>
+                          <tr>
+                            <th>Ticket</th>
+                            <th>Employee</th>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>#1042</td>
+                            <td>Issam Fawaz</td>
+                            <td>Wi-Fi issue</td>
+                            <td><span class="status progress">In Progress</span></td>
+                            <td><span class="button secondary">Open</span></td>
+                          </tr>
+                          <tr>
+                            <td>#1040</td>
+                            <td>Accounting</td>
+                            <td>Printer offline</td>
+                            <td><span class="status open">Open</span></td>
+                            <td><span class="button secondary">Assign</span></td>
+                          </tr>
+                          <tr>
+                            <td>#1039</td>
+                            <td>HR Team</td>
+                            <td>VPN access request</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><span class="button secondary">Reply</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <aside class="panel" data-component="AgentWorkloadSummary">
+                      <div class="panel-title"><h4>Workload</h4></div>
+                      <div class="panel-body workload-list">
+                        <div class="workload-item"><strong>12 assigned</strong><span>Current agent workload</span></div>
+                        <div class="workload-item"><strong>4 high priority</strong><span>Needs quicker attention</span></div>
+                        <div class="workload-item"><strong>7 due soon</strong><span>Should be reviewed today</span></div>
+                        <div class="workload-item"><strong>31 resolved</strong><span>This month</span></div>
+                      </div>
+                    </aside>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="manager-reports">
+          <div class="screen-header">
+            <div>
+              <h2>6. Manager Reports</h2>
+              <p>Manager view for monitoring team tickets, priorities, categories, and agent workload.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /manager/reports</span>
+              <span class="pill teal">Page: ManagerReportsPage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Summary</span><strong>ReportSummaryCards</strong></div>
+              <div class="map-item"><span>Charts</span><strong>TicketsByCategoryChart</strong></div>
+              <div class="map-item"><span>Performance</span><strong>AgentPerformanceTable</strong></div>
+              <div class="map-item"><span>Export</span><strong>ExportReportButton</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/manager/reports</span>
+              </div>
+              <div class="app-frame app-shell" data-component="ManagerReportsPage">
+                <header class="top-navigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>Reports</span></div>
+                  <div class="search">Filter by date range or team</div>
+                  <span class="pill amber">Manager</span>
+                </header>
+                <aside class="role-sidebar">
+                  <div class="side-link">Team dashboard</div>
+                  <div class="side-link active">Reports</div>
+                  <div class="side-link">Critical tickets</div>
+                  <div class="side-link">Agent performance</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="page-title-row">
+                    <div>
+                      <h3>Team ticket overview</h3>
+                      <p>High-level reporting for weekly review meetings.</p>
+                    </div>
+                    <span class="button secondary">Export report</span>
+                  </div>
+                  <div class="summary-grid" data-component="ReportSummaryCards">
+                    <div class="summary-card"><strong>38</strong><span>Open tickets</span></div>
+                    <div class="summary-card"><strong>11</strong><span>Pending tickets</span></div>
+                    <div class="summary-card"><strong>64</strong><span>Resolved this month</span></div>
+                    <div class="summary-card"><strong>6h</strong><span>Average resolution</span></div>
+                  </div>
+                  <div class="admin-grid">
+                    <div class="panel" data-component="TicketsByCategoryChart">
+                      <div class="panel-title"><h4>Tickets by category</h4></div>
+                      <div class="panel-body">
+                        <div class="property-row"><span>Hardware</span><strong>14</strong></div>
+                        <div class="property-row"><span>Software</span><strong>18</strong></div>
+                        <div class="property-row"><span>Network</span><strong>9</strong></div>
+                        <div class="property-row"><span>Access Request</span><strong>7</strong></div>
+                      </div>
+                    </div>
+                    <div class="panel" data-component="AgentPerformanceTable">
+                      <div class="panel-title"><h4>Agent performance</h4></div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Agent</th>
+                            <th>Assigned</th>
+                            <th>Resolved</th>
+                            <th>Avg time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Adam Diab</td>
+                            <td>12</td>
+                            <td>9</td>
+                            <td>5h</td>
+                          </tr>
+                          <tr>
+                            <td>Network Team</td>
+                            <td>18</td>
+                            <td>14</td>
+                            <td>7h</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="notifications">
+          <div class="screen-header">
+            <div>
+              <h2>7. Notification Center</h2>
+              <p>In-app alerts for ticket updates, assignments, mentions, and status changes.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /notifications</span>
+              <span class="pill teal">Page: NotificationsPage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>List</span><strong>NotificationList</strong></div>
+              <div class="map-item"><span>Item</span><strong>NotificationItem</strong></div>
+              <div class="map-item"><span>State</span><strong>UnreadBadge</strong></div>
+              <div class="map-item"><span>Action</span><strong>MarkAsReadButton</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/notifications</span>
+              </div>
+              <div class="app-frame app-shell" data-component="NotificationsPage">
+                <header class="top-navigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>Notifications</span></div>
+                  <div class="search">Search alerts</div>
+                  <span class="pill blue">Employee</span>
+                </header>
+                <aside class="role-sidebar">
+                  <div class="side-link active">All notifications</div>
+                  <div class="side-link">Unread</div>
+                  <div class="side-link">Mentions</div>
+                  <div class="side-link">Assignments</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="page-title-row">
+                    <div>
+                      <h3>Recent updates</h3>
+                      <p>Users can quickly see what changed without opening every ticket.</p>
+                    </div>
+                    <span class="button secondary">Mark all as read</span>
+                  </div>
+                  <div class="panel" data-component="NotificationList">
+                    <div class="panel-body">
+                      <div class="message" data-component="NotificationItem">
+                        <strong>Ticket #1042 moved to In Progress</strong>
+                        Adam Diab started working on the Wi-Fi connectivity issue.
+                      </div>
+                      <div class="message" data-component="NotificationItem">
+                        <strong>You were mentioned on Ticket #1039</strong>
+                        HR Team needs confirmation for the VPN access request.
+                      </div>
+                      <div class="message" data-component="NotificationItem">
+                        <strong>Ticket #1025 was closed</strong>
+                        The software installation request was completed and closed.
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="admin-console">
+          <div class="screen-header">
+            <div>
+              <h2>8. Admin Console</h2>
+              <p>Setup area for managing people, departments, teams, and categories.</p>
+            </div>
+            <div class="pill-row">
+              <span class="pill blue">Route: /admin</span>
+              <span class="pill teal">Page: AdminConsolePage</span>
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="component-map">
+              <div class="map-item"><span>Sections</span><strong>AdminSectionTabs</strong></div>
+              <div class="map-item"><span>Tables</span><strong>AdminDataTable</strong></div>
+              <div class="map-item"><span>Form</span><strong>EntityFormDrawer</strong></div>
+              <div class="map-item"><span>Mapping</span><strong>CategoryTeamMappingList</strong></div>
+            </div>
+            <div class="mock-browser">
+              <div class="mock-toolbar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mock-url">/admin</span>
+              </div>
+              <div class="app-frame app-shell" data-component="AdminConsolePage">
+                <header class="top-navigation">
+                  <div class="product-name"><span class="mini-mark">IT</span><span>Administration</span></div>
+                  <span class="pill amber">Admin</span>
+                </header>
+                <aside class="role-sidebar" data-component="AdminSectionTabs">
+                  <div class="side-link active">Users</div>
+                  <div class="side-link">Departments</div>
+                  <div class="side-link">Support teams</div>
+                  <div class="side-link">Categories</div>
+                  <div class="side-link">Settings</div>
+                </aside>
+                <section class="main-panel">
+                  <div class="page-title-row">
+                    <div>
+                      <h3>User and category setup</h3>
+                      <p>Admin screens keep the support structure clean before tickets are created.</p>
+                    </div>
+                    <span class="button">Add user</span>
+                  </div>
+                  <div class="admin-grid">
+                    <div class="panel">
+                      <div class="panel-title"><h4>Users</h4><span class="pill">AdminDataTable</span></div>
+                      <table data-component="AdminDataTable">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Issam Fawaz</td>
+                            <td>Employee</td>
+                            <td>Operations</td>
+                            <td><span class="status active">Active</span></td>
+                          </tr>
+                          <tr>
+                            <td>Adam Diab</td>
+                            <td>Agent</td>
+                            <td>IT</td>
+                            <td><span class="status active">Active</span></td>
+                          </tr>
+                          <tr>
+                            <td>Helpdesk Manager</td>
+                            <td>Admin</td>
+                            <td>IT</td>
+                            <td><span class="status active">Active</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <aside class="panel" data-component="CategoryTeamMappingList">
+                      <div class="panel-title"><h4>Category routing</h4></div>
+                      <div class="panel-body">
+                        <div class="property-list">
+                          <div class="property-row"><span>Network</span><strong>Network Team</strong></div>
+                          <div class="property-row"><span>Hardware</span><strong>IT Support</strong></div>
+                          <div class="property-row"><span>Software</span><strong>Apps Team</strong></div>
+                          <div class="property-row"><span>Access</span><strong>Security Team</strong></div>
+                        </div>
+                        <span class="button secondary">Manage categories</span>
+                      </div>
+                    </aside>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
