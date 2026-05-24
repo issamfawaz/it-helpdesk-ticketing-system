@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IDS Internship — Assignment 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a18;
+    --muted: #5a5a54;
+    --faint: #9a9a92;
+    --rule: #ddddd5;
+    --accent: #2d5a8e;
+    --accent-light: #e8f0f8;
+    --bg: #fafaf7;
+    --paper: #ffffff;
+    --tag-bg: #f0f0e8;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.75;
+    padding: 0;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 5rem 3rem 8rem;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    margin-bottom: 5rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .cover-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 1.5rem;
+  }
+
+  .cover h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    max-width: 600px;
+  }
+
+  .cover-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .meta-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .meta-value a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .meta-value a:hover { text-decoration: underline; }
+
+  /* ── SECTION STRUCTURE ── */
+  .section {
+    margin-bottom: 4rem;
+  }
+
+  .section-number {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 2rem;
+    margin-bottom: 0.6rem;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: 0.97rem;
+    margin-bottom: 1rem;
+  }
+
+  p strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ── CALLOUT BOX ── */
+  .callout {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    padding: 1.1rem 1.4rem;
+    margin: 1.5rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .callout p {
+    margin: 0;
+    color: #1e3d5c;
+    font-size: 0.93rem;
+  }
+
+  /* ── ROLE TABLE ── */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .role-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    background: var(--paper);
+  }
+
+  .role-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+
+  .role-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── TECH STACK ── */
+  .stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.88rem;
+  }
+
+  .stack-table thead tr {
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .stack-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+  }
+
+  .stack-table td {
+    padding: 0.65rem 0.75rem 0.65rem 0;
+    vertical-align: top;
+    border-bottom: 1px solid var(--rule);
+    color: var(--muted);
+  }
+
+  .stack-table td:first-child {
+    font-weight: 500;
+    color: var(--ink);
+    width: 28%;
+  }
+
+  .stack-table td:nth-child(2) {
+    width: 30%;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── MODULE LIST ── */
+  .module-list {
+    list-style: none;
+    margin-top: 1rem;
+  }
+
+  .module-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .module-list li:last-child { border-bottom: none; }
+
+  .module-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    margin-top: 1.5rem;
+    position: relative;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+    align-items: start;
+  }
+
+  .timeline-week {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--paper);
+    background: var(--ink);
+    border-radius: 4px;
+    padding: 3px 6px;
+    text-align: center;
+    margin-top: 3px;
+    white-space: nowrap;
+  }
+
+  .timeline-week.active {
+    background: var(--accent);
+  }
+
+  .timeline-content {
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+
+  .timeline-title {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.83rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* ── API TABLE ── */
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    margin-top: 1rem;
+  }
+
+  .api-table thead tr { border-bottom: 2px solid var(--ink); }
+
+  .api-table th {
+    text-align: left;
+    padding: 0.4rem 0.6rem 0.4rem 0;
+    font-size: 9.5px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+  }
+
+  .api-table td {
+    padding: 0.55rem 0.6rem 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  .method {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .method.get    { background: #e8f5e9; color: #2e7d32; }
+  .method.post   { background: #e3f2fd; color: #1565c0; }
+  .method.patch  { background: #fff8e1; color: #ef6c00; }
+
+  .endpoint {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+
+  /* ── TEAM SPLIT ── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .team-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1.2rem;
+    background: var(--paper);
+  }
+
+  .team-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .team-task {
+    font-size: 0.83rem;
+    color: var(--muted);
+    padding: 0.25rem 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .team-task::before {
+    content: '—';
+    color: var(--faint);
+    flex-shrink: 0;
+  }
+
+  /* ── STATUS TAGS ── */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    color: var(--muted);
+    border: 1px solid var(--rule);
+  }
+
+  .tag.blue   { background: #e8f0f8; color: #1e4d82; border-color: #bdd0e8; }
+  .tag.green  { background: #e8f5e9; color: #2e7d32; border-color: #b5ddb8; }
+  .tag.amber  { background: #fff8e1; color: #8c5800; border-color: #f5d688; }
+  .tag.red    { background: #fdecea; color: #9c2020; border-color: #f1b8b8; }
+
+  /* ── SCOPE NOTE ── */
+  .scope-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .scope-box {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    background: var(--paper);
+  }
+
+  .scope-box.yes { border-top: 3px solid #4caf50; }
+  .scope-box.no  { border-top: 3px solid var(--rule); }
+
+  .scope-header {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .scope-header.yes { color: #2e7d32; }
+  .scope-header.no  { color: var(--faint); }
+
+  .scope-item {
+    font-size: 0.83rem;
+    color: var(--muted);
+    padding: 0.2rem 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-left {
+    font-size: 0.82rem;
+    color: var(--faint);
+  }
+
+  .footer-right {
+    font-size: 0.82rem;
+    color: var(--faint);
+  }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 3rem 1.5rem 5rem; }
+    .cover h1 { font-size: 2rem; }
+    .role-grid, .team-grid, .scope-split { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: white; }
+    .page { padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <p class="cover-label">IDS Full Stack Internship &nbsp;·&nbsp; Assignment 1</p>
+    <h1>IT Help Desk &amp; Ticketing Management System</h1>
+    <p class="cover-sub">
+      A planning document covering our project scope, architecture decisions, database design,
+      UI wireframes, and roadmap for the eight weeks ahead.
+    </p>
+    <div class="meta-row">
+      <div class="meta-item">
+        <span class="meta-label">Team</span>
+        <span class="meta-value">Issam Fawaz &amp; Adam Diab</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Submitted</span>
+        <span class="meta-value">May 24, 2026</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Repository</span>
+        <span class="meta-value"><a href="https://github.com/issamfawaz/it-helpdesk-ticketing-system" target="_blank">github.com/issamfawaz/it-helpdesk-ticketing-system</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. WHAT IS ASSIGNMENT 1 -->
+  <div class="section">
+    <p class="section-number">01</p>
+    <h2>What this assignment is actually about</h2>
+    <p>
+      The internship runs eight weeks. Assignment 1 maps directly to Week 1 in the project brief —
+      <strong>requirement analysis, planning, wireframes, and database design</strong>. There's no
+      expectation of a working application yet. What this document delivers is the foundation
+      everything else will be built on.
+    </p>
+    <div class="callout">
+      <p>This submission focuses on planning and design, not implementation. The full system will
+      be developed incrementally over the internship — this is the blueprint.</p>
+    </div>
+  </div>
+
+  <!-- 2. THE PROJECT -->
+  <div class="section">
+    <p class="section-number">02</p>
+    <h2>What we're building</h2>
+    <p>
+      A modern, web-based <strong>IT Help Desk and Ticketing Management System</strong> designed to
+      streamline how technical support works inside a company. The idea is straightforward: employees
+      submit support requests through a clean interface, and IT agents, managers, and admins manage
+      everything from a centralized dashboard — assigning tickets, updating statuses, tracking
+      resolution times.
+    </p>
+    <p>
+      The project is intentionally scoped to simulate a real enterprise environment. By the end of
+      the internship it should cover frontend development, RESTful APIs, relational database design,
+      authentication with role-based access control, reporting, and a first pass at AI-assisted
+      features like category suggestions and smart replies.
+    </p>
+  </div>
+
+  <!-- 3. ROLES -->
+  <div class="section">
+    <p class="section-number">03</p>
+    <h2>Who uses the system</h2>
+    <p>Four distinct roles, each with its own view of the world:</p>
+    <div class="role-grid">
+      <div class="role-card">
+        <p class="role-title">Admin</p>
+        <p class="role-desc">Full system access — user management, roles, categories, settings, and reports.</p>
+      </div>
+      <div class="role-card">
+        <p class="role-title">IT Support Agent</p>
+        <p class="role-desc">Manages, assigns, updates, comments on, and resolves tickets.</p>
+      </div>
+      <div class="role-card">
+        <p class="role-title">Employee</p>
+        <p class="role-desc">Creates support tickets, tracks progress, and replies to agent comments.</p>
+      </div>
+      <div class="role-card">
+        <p class="role-title">Manager</p>
+        <p class="role-desc">Monitors team performance and reports without full admin access.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. STACK -->
+  <div class="section">
+    <p class="section-number">04</p>
+    <h2>Technology choices</h2>
+    <p>
+      We landed on a stack that's realistic for a production enterprise environment — not just
+      something that demos well. Here's how we broke it down:
+    </p>
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Frontend</td><td>React.js</td><td>Component-based architecture, good ecosystem, practical skill to develop.</td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS / Material UI</td><td>Wireframes are framework-neutral — final choice made once implementation begins.</td></tr>
+        <tr><td>Backend</td><td>ASP.NET Core Web API</td><td>Solid REST framework, good auth tooling, real-world industry use.</td></tr>
+        <tr><td>Database</td><td>PostgreSQL</td><td>Relational, open-source, handles the schema complexity we've planned.</td></tr>
+        <tr><td>Auth</td><td>JWT / ASP.NET Identity</td><td>Token-based auth with role claims is the standard approach for SPAs.</td></tr>
+        <tr><td>Deployment</td><td>Azure / Docker (later)</td><td>Planned for Week 8 — final deployment is out of scope for this assignment.</td></tr>
+        <tr><td>AI Features</td><td>OpenAI API (later)</td><td>Advanced feature for Week 6+ — categorization, priority hints, suggested replies.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. SCOPE -->
+  <div class="section">
+    <p class="section-number">05</p>
+    <h2>Scope for this assignment</h2>
+    <p>
+      It's worth being precise about what's in and out. Assignment 1 is a planning deliverable —
+      the distinction matters because the rubric shouldn't penalize us for not having a working login.
+    </p>
+    <div class="scope-split">
+      <div class="scope-box yes">
+        <p class="scope-header yes">In scope now</p>
+        <p class="scope-item">Project requirements and modules</p>
+        <p class="scope-item">UI wireframes (8 screens)</p>
+        <p class="scope-item">Relational database schema</p>
+        <p class="scope-item">ERD diagram</p>
+        <p class="scope-item">Application architecture plan</p>
+        <p class="scope-item">Frontend component and route map</p>
+        <p class="scope-item">API endpoint plan</p>
+        <p class="scope-item">GitHub repository structure</p>
+        <p class="scope-item">Workflow diagrams</p>
+      </div>
+      <div class="scope-box no">
+        <p class="scope-header no">Later weeks</p>
+        <p class="scope-item">Working React application</p>
+        <p class="scope-item">ASP.NET Core API implementation</p>
+        <p class="scope-item">Functional login/auth system</p>
+        <p class="scope-item">Deployed website</p>
+        <p class="scope-item">AI integration</p>
+        <p class="scope-item">Report exports (PDF / Excel)</p>
+        <p class="scope-item">Real-time notifications (SignalR)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. MODULES -->
+  <div class="section">
+    <p class="section-number">06</p>
+    <h2>System modules</h2>
+
+    <h3>Authentication &amp; User Management</h3>
+    <p>
+      Login, registration (or admin-created accounts), password reset, profile management,
+      and full role-based access control. Every API route will be protected — Admins,
+      Agents, Employees, and Managers each see a different version of the system.
+      Sessions are token-based using JWT.
+    </p>
+
+    <h3>Ticket Management</h3>
+    <p>
+      The core of the system. Employees create tickets, agents work them, everyone can track
+      history. Tickets carry a <strong>category</strong> (Hardware, Software, Network, Email,
+      Access Request, Other), a <strong>priority</strong>, and a <strong>status</strong>.
+    </p>
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+      <div>
+        <p style="font-size: 0.78rem; font-weight: 500; color: var(--faint); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem;">Priority</p>
+        <div class="tag-row">
+          <span class="tag green">Low</span>
+          <span class="tag blue">Medium</span>
+          <span class="tag amber">High</span>
+          <span class="tag red">Critical</span>
+        </div>
+      </div>
+      <div>
+        <p style="font-size: 0.78rem; font-weight: 500; color: var(--faint); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem;">Status</p>
+        <div class="tag-row">
+          <span class="tag blue">Open</span>
+          <span class="tag amber">In Progress</span>
+          <span class="tag">Pending</span>
+          <span class="tag green">Resolved</span>
+          <span class="tag">Closed</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Assignment &amp; Workflow</h3>
+    <p>
+      Agents can be assigned tickets manually, and reassigned when needed. Every action leaves
+      an audit trail — assignment history, status changes, internal notes — so nothing is lost.
+      Automatic assignment is planned for later once categories and teams stabilize.
+    </p>
+
+    <h3>Notifications</h3>
+    <p>
+      In-app alerts for ticket updates, comments, and @mentions. Email notifications and real-time
+      updates via SignalR are planned for Week 5 as the system matures.
+    </p>
+
+    <h3>Dashboard &amp; Reporting</h3>
+    <p>
+      Summary widgets (open, resolved, pending counts), tickets by category and priority,
+      and agent performance charts. Monthly reports, average resolution time, and optional
+      SLA tracking come in Week 6. Export to PDF or Excel is part of that same milestone.
+    </p>
+
+    <h3>File Attachments</h3>
+    <p>
+      Employees can attach screenshots, logs, or documents to their tickets. The backend
+      will validate file size and type before storing. Downloads are served securely.
+    </p>
+
+    <h3>Knowledge Base <span style="font-size: 0.8rem; font-weight: 400; color: var(--faint);">(optional/advanced)</span></h3>
+    <p>
+      Searchable FAQ articles organized by category. Articles require admin approval before
+      going live. We've included this in the database schema now so the system can grow into
+      it without requiring a migration later.
+    </p>
+
+    <h3>AI Features <span style="font-size: 0.8rem; font-weight: 400; color: var(--faint);">(planned for Week 6)</span></h3>
+    <p>
+      Automatic ticket categorization, priority suggestions, and suggested replies using the
+      OpenAI API. An AI chat assistant for employees — to try resolving issues before
+      creating a ticket — is also on the roadmap. These are baked into the architecture now
+      even though they won't be built until later.
+    </p>
+  </div>
+
+  <!-- 7. DATABASE -->
+  <div class="section">
+    <p class="section-number">07</p>
+    <h2>Database design</h2>
+    <p>
+      The full PostgreSQL schema is in <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">database/schema.sql</code>.
+      We covered everything the brief asked for and went further where it made practical sense.
+    </p>
+
+    <h3>Core tables</h3>
+    <ul class="module-list">
+      <li><span class="module-dot"></span>Users, Roles, Departments</li>
+      <li><span class="module-dot"></span>Tickets, Categories, Priorities, Statuses</li>
+      <li><span class="module-dot"></span>TicketComments, TicketAttachments</li>
+      <li><span class="module-dot"></span>Notifications, ActivityLogs</li>
+    </ul>
+
+    <h3>Additional tables we added</h3>
+    <ul class="module-list">
+      <li><span class="module-dot"></span>SupportTeams and TeamMembers — needed for assignment workflow</li>
+      <li><span class="module-dot"></span>TicketAssignmentHistory — full audit trail of reassignments</li>
+      <li><span class="module-dot"></span>KnowledgeBaseArticles — future-proofing the schema</li>
+      <li><span class="module-dot"></span>AISuggestions — stores AI-generated hints linked to tickets</li>
+    </ul>
+
+    <p>
+      The SQL file also includes seed data for roles, priorities, statuses, departments, support
+      teams, and categories so the system is usable from the first run.
+    </p>
+
+    <p>
+      The ERD is at <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">diagrams/erd.mmd</code>.
+      Key relationships: one role to many users, one department to many users, one employee to many
+      tickets, one ticket to one category/priority/status, and one ticket to many comments,
+      attachments, notifications, AI suggestions, and activity logs.
+    </p>
+  </div>
+
+  <!-- 8. ARCHITECTURE -->
+  <div class="section">
+    <p class="section-number">08</p>
+    <h2>Application architecture</h2>
+    <p>
+      The full architecture diagram lives in <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">diagrams/application_architecture.mmd</code>.
+      The flow is clean and standard:
+    </p>
+    <div class="callout">
+      <p>React frontend → ASP.NET Core Web API controllers → Application services → Entity Framework Core → PostgreSQL</p>
+    </div>
+    <p>
+      On the backend, controllers handle HTTP, DTOs define request/response shapes, services hold
+      business logic, and EF Core manages database access. Authentication middleware protects every
+      non-public route.
+    </p>
+    <p>
+      On the frontend, each screen is a named Page component. Shared UI is broken into reusable
+      Components. Service modules handle API calls. Route guards enforce role-based access
+      — an employee can't reach the agent queue, and a regular user can't touch the admin console.
+    </p>
+  </div>
+
+  <!-- 9. WIREFRAMES & COMPONENTS -->
+  <div class="section">
+    <p class="section-number">09</p>
+    <h2>Wireframes &amp; frontend component plan</h2>
+    <p>
+      Wireframes are in <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">wireframes/wireframes.html</code>.
+      Eight screens covering the highest-priority flows:
+    </p>
+    <ul class="module-list">
+      <li><span class="module-dot"></span>AuthLoginPage</li>
+      <li><span class="module-dot"></span>EmployeeTicketListPage</li>
+      <li><span class="module-dot"></span>TicketCreatePage</li>
+      <li><span class="module-dot"></span>TicketDetailPage</li>
+      <li><span class="module-dot"></span>AgentQueuePage</li>
+      <li><span class="module-dot"></span>ManagerReportsPage</li>
+      <li><span class="module-dot"></span>NotificationsPage</li>
+      <li><span class="module-dot"></span>AdminConsolePage</li>
+    </ul>
+    <p>
+      Register, Profile, and Knowledge Base screens are in the component plan as named
+      routes and will have wireframes added before implementation begins in Week 2.
+      The full component and route mapping is in
+      <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">docs/frontend_component_plan.md</code>.
+    </p>
+  </div>
+
+  <!-- 10. API ENDPOINTS -->
+  <div class="section">
+    <p class="section-number">10</p>
+    <h2>Initial API endpoint plan</h2>
+    <p>These endpoints represent the first implementation target — not an exhaustive final list.</p>
+    <table class="api-table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Endpoint</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/auth/login</td><td>Authenticate a user, return JWT.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/auth/register</td><td>Register or create a new user account.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/tickets</td><td>List tickets — results filtered by caller's role.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/tickets</td><td>Create a new ticket.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/tickets/{id}</td><td>Fetch full ticket detail.</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td class="endpoint">/api/tickets/{id}</td><td>Update status, priority, category, or assignment.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/tickets/{id}/comments</td><td>Add a comment or internal note.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/tickets/{id}/attachments</td><td>Upload a file attachment.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/notifications</td><td>List notifications for the current user.</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td class="endpoint">/api/notifications/{id}/read</td><td>Mark a notification as read.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/reports/summary</td><td>Dashboard summary data.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/categories</td><td>List all ticket categories.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/users</td><td>Admin — list all users.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/admin/users</td><td>Admin — create a new user.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/knowledge-base</td><td>Search knowledge base articles.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/ai/ticket-suggestions</td><td>AI category, priority, and reply hints (Week 6+).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. TIMELINE -->
+  <div class="section">
+    <p class="section-number">11</p>
+    <h2>Eight-week roadmap</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-week active">WK 1</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Planning, wireframes, ERD, database schema</p>
+          <p class="timeline-desc">This submission. Foundation for everything that follows.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 2</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Project setup, authentication, role management</p>
+          <p class="timeline-desc">Login/Register system, JWT auth, protected routes.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 3</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Ticket CRUD, categories, priorities</p>
+          <p class="timeline-desc">Fully functional ticket module — create, read, update, delete.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 4</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Assignment workflow, comments, statuses</p>
+          <p class="timeline-desc">End-to-end ticket lifecycle, agent workflow, internal notes.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 5</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Notifications, file uploads, dashboard</p>
+          <p class="timeline-desc">Analytics widgets, notification system, attachment handling.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 6</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Reports, exports, AI prototype</p>
+          <p class="timeline-desc">Charts, PDF/Excel export, first AI features using OpenAI API.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 7</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Testing, bug fixes, responsive polish</p>
+          <p class="timeline-desc">Stable staging version, cross-device testing, performance.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-week">WK 8</span>
+        <div class="timeline-content">
+          <p class="timeline-title">Deployment, documentation, final demo</p>
+          <p class="timeline-desc">Production deployment, final README, presentation ready.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. TEAM -->
+  <div class="section">
+    <p class="section-number">12</p>
+    <h2>How we split the work</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <p class="team-name">Issam Fawaz</p>
+        <p class="team-task">Database schema design</p>
+        <p class="team-task">ERD diagram</p>
+        <p class="team-task">ASP.NET Core API architecture planning</p>
+        <p class="team-task">GitHub repository structure</p>
+      </div>
+      <div class="team-card">
+        <p class="team-name">Adam Diab</p>
+        <p class="team-task">UI wireframes (all 8 screens)</p>
+        <p class="team-task">Workflow diagrams</p>
+        <p class="team-task">React component and route plan</p>
+        <p class="team-task">Documentation review</p>
+      </div>
+    </div>
+    <p style="margin-top: 1rem;">
+      Requirement gathering, architecture review, and the final submission check were done together.
+    </p>
+  </div>
+
+  <!-- 13. REPO -->
+  <div class="section">
+    <p class="section-number">13</p>
+    <h2>Repository structure</h2>
+    <p>
+      Repository: <a href="https://github.com/issamfawaz/it-helpdesk-ticketing-system" target="_blank"
+        style="color: var(--accent); text-decoration: none;">github.com/issamfawaz/it-helpdesk-ticketing-system</a>
+    </p>
+    <div style="margin-top: 1rem; background: var(--tag-bg); border-radius: 8px; padding: 1.2rem 1.4rem; font-family: 'Courier New', monospace; font-size: 0.83rem; line-height: 1.9; color: var(--ink); border: 1px solid var(--rule);">
+      it-helpdesk-ticketing-system/<br>
+      &nbsp;&nbsp;backend/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">ASP.NET Core project</span><br>
+      &nbsp;&nbsp;frontend/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">React application</span><br>
+      &nbsp;&nbsp;database/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">schema.sql and seed data</span><br>
+      &nbsp;&nbsp;diagrams/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">ERD, architecture, workflows</span><br>
+      &nbsp;&nbsp;docs/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">frontend component plan</span><br>
+      &nbsp;&nbsp;wireframes/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: var(--faint); font-family: 'DM Sans', sans-serif; font-size: 0.78rem;">wireframes.html</span><br>
+      &nbsp;&nbsp;README.md
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p class="footer-left">Issam Fawaz &amp; Adam Diab &nbsp;·&nbsp; IDS Internship, Assignment 1</p>
+    <p class="footer-right">May 24, 2026</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+flowchart LR
+    subgraph Client["Client Layer"]
+        React["React.js SPA"]
+        Browser["User Browser"]
+    end
+
+    subgraph Api["Backend Layer - ASP.NET Core Web API"]
+        Controllers["API Controllers"]
+        Auth["Authentication and Authorization"]
+        Services["Application Services"]
+        TicketService["Ticket Workflow Service"]
+        NotificationService["Notification Service"]
+        ReportService["Reporting Service"]
+        AIService["AI Suggestion Service"]
+        DTOs["DTOs and Validation"]
+    end
+
+    subgraph Data["Data Layer"]
+        EF["Entity Framework Core DbContext"]
+        Migrations["EF Core Migrations"]
+    end
+
+    subgraph Storage["Persistence Layer"]
+        Postgres[("PostgreSQL")]
+        FileStore[("Attachment Storage")]
+    end
+
+    subgraph External["Optional External Services"]
+        Email["Email Provider"]
+        OpenAI["OpenAI API or Azure OpenAI"]
+    end
+
+    Browser --> React
+    React -->|HTTPS REST API| Controllers
+    Controllers --> Auth
+    Controllers --> DTOs
+    Controllers --> Services
+    Services --> TicketService
+    Services --> NotificationService
+    Services --> ReportService
+    Services --> AIService
+    TicketService --> EF
+    NotificationService --> EF
+    ReportService --> EF
+    AIService --> EF
+    EF --> Migrations
+    EF --> Postgres
+    TicketService --> FileStore
+    NotificationService --> Email
+    AIService --> OpenAI
