@@ -1,6 +1,6 @@
-# IT Helpdesk Ticketing System - Assignment 1
+# IT Helpdesk Ticketing System
 
-IDS Internship Assignment 1 planning deliverables
+IDS Internship full stack web development project
 
 Team:
 - Issam Fawaz
@@ -13,7 +13,7 @@ https://github.com/issamfawaz/it-helpdesk-ticketing-system
 
 This project is an internal IT Helpdesk Ticketing System. It lets employees submit IT issues, lets support agents triage and resolve those issues, gives managers reporting visibility, and gives admins a place to manage users, teams, departments, and categories.
 
-This repository section contains the planning deliverables for Assignment 1, before full development starts.
+This repository contains the planning deliverables for Assignment 1 and the initial project setup for Assignment 2.
 
 ## Chosen Stack
 
@@ -36,6 +36,9 @@ This repository section contains the planning deliverables for Assignment 1, bef
 | ERD diagram | `diagrams/erd.mmd` |
 | PostgreSQL schema | `database/schema.sql` |
 | UI wireframes | `wireframes/wireframes.html` |
+| Assignment 2 report | `docs/assignment2_report.md` |
+| ASP.NET Core API setup | `backend/Helpdesk.Api` |
+| React frontend setup | `frontend` |
 
 Database naming note: the SQL schema uses PascalCase table and column names, such as `Tickets`, `TicketComments`, `TicketId`, and `CreatedAt`, as requested by the instructor.
 
@@ -44,7 +47,9 @@ Database naming note: the SQL schema uses PascalCase table and column names, suc
 ```text
 it-helpdesk-ticketing-system/
   backend/
+    Helpdesk.Api/
   frontend/
+    src/
   database/
     schema.sql
   diagrams/
@@ -52,7 +57,8 @@ it-helpdesk-ticketing-system/
     erd.mmd
     system_workflows.md
   docs/
-    assignment1_report.md
+    IDS_Assignment1_Report.html
+    assignment2_report.md
     frontend_component_plan.md
     project_proposal.md
   wireframes/
@@ -71,3 +77,13 @@ it-helpdesk-ticketing-system/
 - ERD diagram prepared
 - Application architecture planned
 - GitHub repository link included
+
+## Assignment 2 Checklist
+
+- React project setup included
+- ASP.NET Core Web API setup included
+- PostgreSQL connection configured
+- JWT authentication structure included
+- Login/index pages included
+- Role-based authorization policies included
+- Demo accounts documented
