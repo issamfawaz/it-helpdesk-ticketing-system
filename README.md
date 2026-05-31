@@ -1,89 +1,43 @@
-# IT Helpdesk Ticketing System
+# Frontend Setup - Assignment 2
 
-IDS Internship full stack web development project
+Project: IT Help Desk & Ticketing Management System
 
-Team:
-- Issam Fawaz
-- Adam Diab
+Frontend stack:
+- React.js
+- Vite
+- Role-aware login/index pages
 
-Repository:
-https://github.com/issamfawaz/it-helpdesk-ticketing-system
+## What This Frontend Includes
 
-## Project Summary
+- Login page.
+- Basic authenticated index/dashboard page.
+- Demo accounts for Admin, IT Support Agent, Employee, and Manager.
+- API login call to the ASP.NET Core backend.
+- Local fallback login for demo use before the backend is running.
+- Role-based UI examples after login.
 
-This project is an internal IT Helpdesk Ticketing System. It lets employees submit IT issues, lets support agents triage and resolve those issues, gives managers reporting visibility, and gives admins a place to manage users, teams, departments, and categories.
+## Demo Login Accounts
 
-This repository contains the planning deliverables for Assignment 1 and the initial project setup for Assignment 2.
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@company.com` | `Admin123!` |
+| IT Support Agent | `adam.diab@company.com` | `Agent123!` |
+| Employee | `issam.fawaz@company.com` | `Employee123!` |
+| Manager | `manager@company.com` | `Manager123!` |
 
-## Chosen Stack
+## Run Commands
 
-| Layer | Technology |
-| --- | --- |
-| Frontend | React.js |
-| Backend | ASP.NET Core Web API |
-| Database | PostgreSQL |
-| Source control | GitHub |
+Install Node.js first, then run:
 
-## What To Review
-
-| Deliverable | File |
-| --- | --- |
-| Full assignment report | `docs/IDS_Assignment1_Report.html` |
-| Project proposal | `docs/project_proposal.md` |
-| Frontend component and route plan | `docs/frontend_component_plan.md` |
-| Workflow diagrams | `diagrams/system_workflows.md` |
-| Application architecture diagram | `diagrams/application_architecture.mmd` |
-| ERD diagram | `diagrams/erd.mmd` |
-| PostgreSQL schema | `database/schema.sql` |
-| UI wireframes | `wireframes/wireframes.html` |
-| Assignment 2 report | `docs/assignment2_report.md` |
-| ASP.NET Core API setup | `backend/Helpdesk.Api` |
-| React frontend setup | `frontend` |
-
-Database naming note: the SQL schema uses PascalCase table and column names, such as `Tickets`, `TicketComments`, `TicketId`, and `CreatedAt`, as requested by the instructor.
-
-## Suggested Repository Structure
-
-```text
-it-helpdesk-ticketing-system/
-  backend/
-    Helpdesk.Api/
-  frontend/
-    src/
-  database/
-    schema.sql
-  diagrams/
-    application_architecture.mmd
-    erd.mmd
-    system_workflows.md
-  docs/
-    IDS_Assignment1_Report.html
-    assignment2_report.md
-    frontend_component_plan.md
-    project_proposal.md
-  wireframes/
-    wireframes.html
-  README.md
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-## Assignment 1 Checklist
+The frontend expects the API base URL from:
 
-- Project scope defined
-- Requirements gathered
-- Project proposal prepared
-- Workflow diagrams prepared
-- UI wireframes prepared
-- PostgreSQL database schema and seed/sample data designed
-- ERD diagram prepared
-- Application architecture planned
-- GitHub repository link included
+```text
+VITE_API_BASE_URL=https://localhost:5001/api
+```
 
-## Assignment 2 Checklist
-
-- React project setup included
-- ASP.NET Core Web API setup included
-- PostgreSQL connection configured
-- JWT authentication structure included
-- Login/index pages included
-- Role-based authorization policies included
-- Demo accounts documented

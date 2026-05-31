@@ -1,0 +1,83 @@
+import { useState } from "react";
+
+const demoUsers = [
+  ["Employee", "issam.fawaz@company.com", "Employee123!"],
+  ["IT Support Agent", "adam.diab@company.com", "Agent123!"],
+  ["Manager", "manager@company.com", "Manager123!"],
+  ["Admin", "admin@company.com", "Admin123!"]
+];
+
+export default function LoginPage({ error, isLoading, onLogin }) {
+  const [email, setEmail] = useState("issam.fawaz@company.com");
+  const [password, setPassword] = useState("Employee123!");
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onLogin({ email, password });
+  }
+
+  return (
+    <main className="auth-page">
+      <section className="auth-intro">
+        <span className="eyebrow">Assignment 2</span>
+        <h1>IT Help Desk & Ticketing Management System</h1>
+        <p>
+          Login page for JWT authentication and role-based access. Users are redirected
+          to the correct dashboard experience based on their role.
+        </p>
+      </section>
+
+      <section className="login-panel">
+        <h2>Sign in</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <label>
+            Email address
+            <input
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              type="email"
+              autoComplete="email"
+              required
+            />
+          </label>
+
+          <label>
+            Password
+            <input
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </label>
+
+          {error ? <p className="error-text">{error}</p> : null}
+
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
+
+        <div className="demo-box">
+          <strong>Demo accounts</strong>
+          {demoUsers.map(([role, userEmail, userPassword]) => (
+            <button
+              className="demo-account"
+              key={userEmail}
+              type="button"
+              onClick={() => {
+                setEmail(userEmail);
+                setPassword(userPassword);
+              }}
+            >
+              <span>{role}</span>
+              <small>{userEmail}</small>
+            </button>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
