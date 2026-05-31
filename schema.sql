@@ -2,231 +2,233 @@
 -- Project: IT Help Desk & Ticketing Management System
 -- Team: Issam Fawaz and Adam Diab
 -- Database: PostgreSQL
+-- Naming convention: PascalCase table and column names.
+-- PostgreSQL requires double quotes to preserve PascalCase identifiers.
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TABLE roles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "Roles" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(50) NOT NULL UNIQUE,
+    "Description" TEXT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE departments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "Departments" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(100) NOT NULL UNIQUE,
+    "Description" TEXT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    role_id UUID NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
-    department_id UUID REFERENCES departments(id) ON DELETE SET NULL,
-    full_name VARCHAR(150) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    phone VARCHAR(30),
-    job_title VARCHAR(100),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    last_login_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "Users" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "RoleId" UUID NOT NULL REFERENCES "Roles"("Id") ON DELETE RESTRICT,
+    "DepartmentId" UUID REFERENCES "Departments"("Id") ON DELETE SET NULL,
+    "FullName" VARCHAR(150) NOT NULL,
+    "Email" VARCHAR(255) NOT NULL UNIQUE,
+    "PasswordHash" VARCHAR(255) NOT NULL,
+    "Phone" VARCHAR(30),
+    "JobTitle" VARCHAR(100),
+    "IsActive" BOOLEAN NOT NULL DEFAULT TRUE,
+    "LastLoginAt" TIMESTAMPTZ,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "UpdatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE support_teams (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(120) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "SupportTeams" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(120) NOT NULL UNIQUE,
+    "Description" TEXT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE team_members (
-    team_id UUID NOT NULL REFERENCES support_teams(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    member_role VARCHAR(50) NOT NULL DEFAULT 'member',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (team_id, user_id)
+CREATE TABLE "TeamMembers" (
+    "TeamId" UUID NOT NULL REFERENCES "SupportTeams"("Id") ON DELETE CASCADE,
+    "UserId" UUID NOT NULL REFERENCES "Users"("Id") ON DELETE CASCADE,
+    "MemberRole" VARCHAR(50) NOT NULL DEFAULT 'member',
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY ("TeamId", "UserId")
 );
 
-CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    default_team_id UUID REFERENCES support_teams(id) ON DELETE SET NULL,
-    name VARCHAR(120) NOT NULL UNIQUE,
-    description TEXT,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "Categories" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "DefaultTeamId" UUID REFERENCES "SupportTeams"("Id") ON DELETE SET NULL,
+    "Name" VARCHAR(120) NOT NULL UNIQUE,
+    "Description" TEXT,
+    "IsActive" BOOLEAN NOT NULL DEFAULT TRUE,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE priorities (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(50) NOT NULL UNIQUE,
-    sort_order INTEGER NOT NULL UNIQUE,
-    response_target_hours INTEGER,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE
+CREATE TABLE "Priorities" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(50) NOT NULL UNIQUE,
+    "SortOrder" INTEGER NOT NULL UNIQUE,
+    "ResponseTargetHours" INTEGER,
+    "IsActive" BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE statuses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(50) NOT NULL UNIQUE,
-    sort_order INTEGER NOT NULL UNIQUE,
-    is_terminal BOOLEAN NOT NULL DEFAULT FALSE,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE
+CREATE TABLE "Statuses" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(50) NOT NULL UNIQUE,
+    "SortOrder" INTEGER NOT NULL UNIQUE,
+    "IsTerminal" BOOLEAN NOT NULL DEFAULT FALSE,
+    "IsActive" BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE tickets (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_number BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE,
-    requester_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    category_id UUID NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
-    priority_id UUID NOT NULL REFERENCES priorities(id) ON DELETE RESTRICT,
-    status_id UUID NOT NULL REFERENCES statuses(id) ON DELETE RESTRICT,
-    assigned_team_id UUID REFERENCES support_teams(id) ON DELETE SET NULL,
-    assigned_to_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    title VARCHAR(180) NOT NULL,
-    description TEXT NOT NULL,
-    cancellation_reason TEXT,
-    due_at TIMESTAMPTZ,
-    resolved_at TIMESTAMPTZ,
-    closed_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "Tickets" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketNumber" BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE,
+    "RequesterId" UUID NOT NULL REFERENCES "Users"("Id") ON DELETE RESTRICT,
+    "CategoryId" UUID NOT NULL REFERENCES "Categories"("Id") ON DELETE RESTRICT,
+    "PriorityId" UUID NOT NULL REFERENCES "Priorities"("Id") ON DELETE RESTRICT,
+    "StatusId" UUID NOT NULL REFERENCES "Statuses"("Id") ON DELETE RESTRICT,
+    "AssignedTeamId" UUID REFERENCES "SupportTeams"("Id") ON DELETE SET NULL,
+    "AssignedToUserId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "Title" VARCHAR(180) NOT NULL,
+    "Description" TEXT NOT NULL,
+    "CancellationReason" TEXT,
+    "DueAt" TIMESTAMPTZ,
+    "ResolvedAt" TIMESTAMPTZ,
+    "ClosedAt" TIMESTAMPTZ,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "UpdatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE ticket_assignment_history (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
-    assigned_team_id UUID REFERENCES support_teams(id) ON DELETE SET NULL,
-    assigned_to_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    assigned_by_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    note TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "TicketAssignmentHistory" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketId" UUID NOT NULL REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "AssignedTeamId" UUID REFERENCES "SupportTeams"("Id") ON DELETE SET NULL,
+    "AssignedToUserId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "AssignedByUserId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "Note" TEXT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE ticket_comments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
-    author_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    body TEXT NOT NULL,
-    is_internal BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "TicketComments" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketId" UUID NOT NULL REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "AuthorId" UUID NOT NULL REFERENCES "Users"("Id") ON DELETE RESTRICT,
+    "Body" TEXT NOT NULL,
+    "IsInternal" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE ticket_attachments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
-    uploaded_by_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    file_name VARCHAR(255) NOT NULL,
-    file_url TEXT NOT NULL,
-    content_type VARCHAR(120),
-    file_size_bytes BIGINT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "TicketAttachments" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketId" UUID NOT NULL REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "UploadedByUserId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "FileName" VARCHAR(255) NOT NULL,
+    "FileUrl" TEXT NOT NULL,
+    "ContentType" VARCHAR(120),
+    "FileSizeBytes" BIGINT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    ticket_id UUID REFERENCES tickets(id) ON DELETE CASCADE,
-    title VARCHAR(160) NOT NULL,
-    message TEXT NOT NULL,
-    is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    read_at TIMESTAMPTZ
+CREATE TABLE "Notifications" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID NOT NULL REFERENCES "Users"("Id") ON DELETE CASCADE,
+    "TicketId" UUID REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "Title" VARCHAR(160) NOT NULL,
+    "Message" TEXT NOT NULL,
+    "IsRead" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "ReadAt" TIMESTAMPTZ
 );
 
-CREATE TABLE knowledge_base_articles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-    author_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    title VARCHAR(180) NOT NULL,
-    content TEXT NOT NULL,
-    is_published BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "KnowledgeBaseArticles" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "CategoryId" UUID REFERENCES "Categories"("Id") ON DELETE SET NULL,
+    "AuthorId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "Title" VARCHAR(180) NOT NULL,
+    "Content" TEXT NOT NULL,
+    "IsPublished" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "UpdatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE ai_suggestions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
-    suggested_category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-    suggested_priority_id UUID REFERENCES priorities(id) ON DELETE SET NULL,
-    suggested_reply TEXT,
-    confidence_score NUMERIC(5, 4),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "AISuggestions" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketId" UUID NOT NULL REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "SuggestedCategoryId" UUID REFERENCES "Categories"("Id") ON DELETE SET NULL,
+    "SuggestedPriorityId" UUID REFERENCES "Priorities"("Id") ON DELETE SET NULL,
+    "SuggestedReply" TEXT,
+    "ConfidenceScore" NUMERIC(5, 4),
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE activity_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ticket_id UUID REFERENCES tickets(id) ON DELETE CASCADE,
-    actor_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    action VARCHAR(80) NOT NULL,
-    old_value TEXT,
-    new_value TEXT,
-    note TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE "ActivityLogs" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "TicketId" UUID REFERENCES "Tickets"("Id") ON DELETE CASCADE,
+    "ActorUserId" UUID REFERENCES "Users"("Id") ON DELETE SET NULL,
+    "Action" VARCHAR(80) NOT NULL,
+    "OldValue" TEXT,
+    "NewValue" TEXT,
+    "Note" TEXT,
+    "CreatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_users_role_id ON users(role_id);
-CREATE INDEX idx_users_department_id ON users(department_id);
+CREATE INDEX "IXUsersRoleId" ON "Users"("RoleId");
+CREATE INDEX "IXUsersDepartmentId" ON "Users"("DepartmentId");
 
-CREATE INDEX idx_team_members_user_id ON team_members(user_id);
+CREATE INDEX "IXTeamMembersUserId" ON "TeamMembers"("UserId");
 
-CREATE INDEX idx_categories_default_team_id ON categories(default_team_id);
+CREATE INDEX "IXCategoriesDefaultTeamId" ON "Categories"("DefaultTeamId");
 
-CREATE INDEX idx_tickets_requester_id ON tickets(requester_id);
-CREATE INDEX idx_tickets_category_id ON tickets(category_id);
-CREATE INDEX idx_tickets_priority_id ON tickets(priority_id);
-CREATE INDEX idx_tickets_status_id ON tickets(status_id);
-CREATE INDEX idx_tickets_assigned_team_id ON tickets(assigned_team_id);
-CREATE INDEX idx_tickets_assigned_to_user_id ON tickets(assigned_to_user_id);
-CREATE INDEX idx_tickets_created_at ON tickets(created_at);
+CREATE INDEX "IXTicketsRequesterId" ON "Tickets"("RequesterId");
+CREATE INDEX "IXTicketsCategoryId" ON "Tickets"("CategoryId");
+CREATE INDEX "IXTicketsPriorityId" ON "Tickets"("PriorityId");
+CREATE INDEX "IXTicketsStatusId" ON "Tickets"("StatusId");
+CREATE INDEX "IXTicketsAssignedTeamId" ON "Tickets"("AssignedTeamId");
+CREATE INDEX "IXTicketsAssignedToUserId" ON "Tickets"("AssignedToUserId");
+CREATE INDEX "IXTicketsCreatedAt" ON "Tickets"("CreatedAt");
 
-CREATE INDEX idx_ticket_assignment_history_ticket_id ON ticket_assignment_history(ticket_id);
-CREATE INDEX idx_ticket_comments_ticket_id ON ticket_comments(ticket_id);
-CREATE INDEX idx_ticket_comments_author_id ON ticket_comments(author_id);
-CREATE INDEX idx_ticket_attachments_ticket_id ON ticket_attachments(ticket_id);
+CREATE INDEX "IXTicketAssignmentHistoryTicketId" ON "TicketAssignmentHistory"("TicketId");
+CREATE INDEX "IXTicketCommentsTicketId" ON "TicketComments"("TicketId");
+CREATE INDEX "IXTicketCommentsAuthorId" ON "TicketComments"("AuthorId");
+CREATE INDEX "IXTicketAttachmentsTicketId" ON "TicketAttachments"("TicketId");
 
-CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_ticket_id ON notifications(ticket_id);
-CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX "IXNotificationsUserId" ON "Notifications"("UserId");
+CREATE INDEX "IXNotificationsTicketId" ON "Notifications"("TicketId");
+CREATE INDEX "IXNotificationsIsRead" ON "Notifications"("IsRead");
 
-CREATE INDEX idx_knowledge_base_articles_category_id ON knowledge_base_articles(category_id);
-CREATE INDEX idx_ai_suggestions_ticket_id ON ai_suggestions(ticket_id);
-CREATE INDEX idx_activity_logs_ticket_id ON activity_logs(ticket_id);
-CREATE INDEX idx_activity_logs_actor_user_id ON activity_logs(actor_user_id);
+CREATE INDEX "IXKnowledgeBaseArticlesCategoryId" ON "KnowledgeBaseArticles"("CategoryId");
+CREATE INDEX "IXAISuggestionsTicketId" ON "AISuggestions"("TicketId");
+CREATE INDEX "IXActivityLogsTicketId" ON "ActivityLogs"("TicketId");
+CREATE INDEX "IXActivityLogsActorUserId" ON "ActivityLogs"("ActorUserId");
 
 -- Seed/sample data for the Week 1 database design deliverable.
 
-INSERT INTO roles (id, name, description) VALUES
+INSERT INTO "Roles" ("Id", "Name", "Description") VALUES
     ('00000000-0000-0000-0000-000000000001', 'Admin', 'Full system access'),
     ('00000000-0000-0000-0000-000000000002', 'IT Support Agent', 'Manage and resolve tickets'),
     ('00000000-0000-0000-0000-000000000003', 'Employee', 'Create and track tickets'),
     ('00000000-0000-0000-0000-000000000004', 'Manager', 'Monitor team tickets and reports');
 
-INSERT INTO priorities (id, name, sort_order, response_target_hours) VALUES
+INSERT INTO "Priorities" ("Id", "Name", "SortOrder", "ResponseTargetHours") VALUES
     ('00000000-0000-0000-0000-000000000011', 'Low', 1, 72),
     ('00000000-0000-0000-0000-000000000012', 'Medium', 2, 48),
     ('00000000-0000-0000-0000-000000000013', 'High', 3, 24),
     ('00000000-0000-0000-0000-000000000014', 'Critical', 4, 4);
 
-INSERT INTO statuses (id, name, sort_order, is_terminal) VALUES
+INSERT INTO "Statuses" ("Id", "Name", "SortOrder", "IsTerminal") VALUES
     ('00000000-0000-0000-0000-000000000021', 'Open', 1, FALSE),
     ('00000000-0000-0000-0000-000000000022', 'In Progress', 2, FALSE),
     ('00000000-0000-0000-0000-000000000023', 'Pending', 3, FALSE),
     ('00000000-0000-0000-0000-000000000024', 'Resolved', 4, FALSE),
     ('00000000-0000-0000-0000-000000000025', 'Closed', 5, TRUE);
 
-INSERT INTO departments (id, name, description) VALUES
+INSERT INTO "Departments" ("Id", "Name", "Description") VALUES
     ('00000000-0000-0000-0000-000000000031', 'IT', 'Information technology department'),
     ('00000000-0000-0000-0000-000000000032', 'Operations', 'Internal business operations'),
     ('00000000-0000-0000-0000-000000000033', 'HR', 'Human resources');
 
-INSERT INTO support_teams (id, name, description) VALUES
+INSERT INTO "SupportTeams" ("Id", "Name", "Description") VALUES
     ('00000000-0000-0000-0000-000000000041', 'IT Support', 'General support and hardware issues'),
     ('00000000-0000-0000-0000-000000000042', 'Network Team', 'Network, VPN, and connectivity issues'),
     ('00000000-0000-0000-0000-000000000043', 'Security Team', 'Accounts, permissions, and access requests');
 
-INSERT INTO categories (id, default_team_id, name, description) VALUES
+INSERT INTO "Categories" ("Id", "DefaultTeamId", "Name", "Description") VALUES
     ('00000000-0000-0000-0000-000000000051', '00000000-0000-0000-0000-000000000041', 'Hardware', 'Laptop, printer, monitor, or device issues'),
     ('00000000-0000-0000-0000-000000000052', '00000000-0000-0000-0000-000000000041', 'Software', 'Application installation or software errors'),
     ('00000000-0000-0000-0000-000000000053', '00000000-0000-0000-0000-000000000042', 'Network', 'Wi-Fi, VPN, and connectivity issues'),

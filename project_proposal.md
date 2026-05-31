@@ -68,7 +68,12 @@ For Week 1, our deliverables are:
 - Application architecture diagram.
 - Frontend route and component plan.
 
+Database naming convention:
+
+- Table names and column names use PascalCase.
+- Examples: `Tickets`, `TicketComments`, `TicketId`, `CreatedAt`.
+- PostgreSQL double quotes are used in the SQL script to preserve PascalCase names.
+
 ## Expected Outcome
 
 By the end of the internship, the project should become a working enterprise-style help desk application that demonstrates full stack development, API design, database architecture, authentication, reporting, collaborative Git workflow, and planned AI-assisted support features.
-

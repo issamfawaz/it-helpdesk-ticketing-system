@@ -733,6 +733,14 @@
       The full PostgreSQL schema is in <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">database/schema.sql</code>.
       We covered everything the brief asked for and went further where it made practical sense.
     </p>
+    <p>
+      The database script uses PascalCase for table and column names, as requested.
+      Examples include <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">Tickets</code>,
+      <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">TicketComments</code>,
+      <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">TicketId</code>, and
+      <code style="font-size:0.85em; background: var(--tag-bg); padding: 1px 5px; border-radius: 3px;">CreatedAt</code>.
+      Because PostgreSQL lowercases unquoted identifiers, the SQL script uses double quotes to preserve PascalCase.
+    </p>
 
     <h3>Core tables</h3>
     <ul class="module-list">

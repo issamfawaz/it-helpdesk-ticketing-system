@@ -1,189 +1,189 @@
 erDiagram
-    ROLES ||--o{ USERS : assigned_to
-    DEPARTMENTS ||--o{ USERS : contains
-    USERS ||--o{ TICKETS : creates
-    USERS ||--o{ TICKETS : assigned_to
-    SUPPORT_TEAMS ||--o{ TEAM_MEMBERS : has
-    USERS ||--o{ TEAM_MEMBERS : joins
-    SUPPORT_TEAMS ||--o{ CATEGORIES : routes
-    CATEGORIES ||--o{ TICKETS : classifies
-    PRIORITIES ||--o{ TICKETS : prioritizes
-    STATUSES ||--o{ TICKETS : tracks
-    SUPPORT_TEAMS ||--o{ TICKETS : owns
-    TICKETS ||--o{ TICKET_ASSIGNMENT_HISTORY : records
-    SUPPORT_TEAMS ||--o{ TICKET_ASSIGNMENT_HISTORY : assigned_team
-    USERS ||--o{ TICKET_ASSIGNMENT_HISTORY : assigned_agent
-    TICKETS ||--o{ TICKET_COMMENTS : has
-    USERS ||--o{ TICKET_COMMENTS : writes
-    TICKETS ||--o{ TICKET_ATTACHMENTS : has
-    USERS ||--o{ TICKET_ATTACHMENTS : uploads
-    USERS ||--o{ NOTIFICATIONS : receives
-    TICKETS ||--o{ NOTIFICATIONS : triggers
-    CATEGORIES ||--o{ KNOWLEDGE_BASE_ARTICLES : groups
-    USERS ||--o{ KNOWLEDGE_BASE_ARTICLES : authors
-    TICKETS ||--o{ AI_SUGGESTIONS : receives
-    CATEGORIES ||--o{ AI_SUGGESTIONS : suggested_category
-    PRIORITIES ||--o{ AI_SUGGESTIONS : suggested_priority
-    TICKETS ||--o{ ACTIVITY_LOGS : records
-    USERS ||--o{ ACTIVITY_LOGS : performs
+    Roles ||--o{ Users : AssignedTo
+    Departments ||--o{ Users : Contains
+    Users ||--o{ Tickets : Creates
+    Users ||--o{ Tickets : AssignedTo
+    SupportTeams ||--o{ TeamMembers : Has
+    Users ||--o{ TeamMembers : Joins
+    SupportTeams ||--o{ Categories : Routes
+    Categories ||--o{ Tickets : Classifies
+    Priorities ||--o{ Tickets : Prioritizes
+    Statuses ||--o{ Tickets : Tracks
+    SupportTeams ||--o{ Tickets : Owns
+    Tickets ||--o{ TicketAssignmentHistory : Records
+    SupportTeams ||--o{ TicketAssignmentHistory : AssignedTeam
+    Users ||--o{ TicketAssignmentHistory : AssignedAgent
+    Tickets ||--o{ TicketComments : Has
+    Users ||--o{ TicketComments : Writes
+    Tickets ||--o{ TicketAttachments : Has
+    Users ||--o{ TicketAttachments : Uploads
+    Users ||--o{ Notifications : Receives
+    Tickets ||--o{ Notifications : Triggers
+    Categories ||--o{ KnowledgeBaseArticles : Groups
+    Users ||--o{ KnowledgeBaseArticles : Authors
+    Tickets ||--o{ AISuggestions : Receives
+    Categories ||--o{ AISuggestions : SuggestedCategory
+    Priorities ||--o{ AISuggestions : SuggestedPriority
+    Tickets ||--o{ ActivityLogs : Records
+    Users ||--o{ ActivityLogs : Performs
 
-    ROLES {
-        uuid id PK
-        varchar name
-        text description
-        timestamptz created_at
+    Roles {
+        uuid Id PK
+        varchar Name
+        text Description
+        timestamptz CreatedAt
     }
 
-    DEPARTMENTS {
-        uuid id PK
-        varchar name
-        text description
-        timestamptz created_at
+    Departments {
+        uuid Id PK
+        varchar Name
+        text Description
+        timestamptz CreatedAt
     }
 
-    USERS {
-        uuid id PK
-        uuid role_id FK
-        uuid department_id FK
-        varchar full_name
-        varchar email
-        varchar password_hash
-        varchar phone
-        varchar job_title
-        boolean is_active
-        timestamptz last_login_at
-        timestamptz created_at
-        timestamptz updated_at
+    Users {
+        uuid Id PK
+        uuid RoleId FK
+        uuid DepartmentId FK
+        varchar FullName
+        varchar Email
+        varchar PasswordHash
+        varchar Phone
+        varchar JobTitle
+        boolean IsActive
+        timestamptz LastLoginAt
+        timestamptz CreatedAt
+        timestamptz UpdatedAt
     }
 
-    SUPPORT_TEAMS {
-        uuid id PK
-        varchar name
-        text description
-        timestamptz created_at
+    SupportTeams {
+        uuid Id PK
+        varchar Name
+        text Description
+        timestamptz CreatedAt
     }
 
-    TEAM_MEMBERS {
-        uuid team_id PK,FK
-        uuid user_id PK,FK
-        varchar member_role
-        timestamptz created_at
+    TeamMembers {
+        uuid TeamId PK,FK
+        uuid UserId PK,FK
+        varchar MemberRole
+        timestamptz CreatedAt
     }
 
-    CATEGORIES {
-        uuid id PK
-        uuid default_team_id FK
-        varchar name
-        text description
-        boolean is_active
-        timestamptz created_at
+    Categories {
+        uuid Id PK
+        uuid DefaultTeamId FK
+        varchar Name
+        text Description
+        boolean IsActive
+        timestamptz CreatedAt
     }
 
-    PRIORITIES {
-        uuid id PK
-        varchar name
-        int sort_order
-        int response_target_hours
-        boolean is_active
+    Priorities {
+        uuid Id PK
+        varchar Name
+        int SortOrder
+        int ResponseTargetHours
+        boolean IsActive
     }
 
-    STATUSES {
-        uuid id PK
-        varchar name
-        int sort_order
-        boolean is_terminal
-        boolean is_active
+    Statuses {
+        uuid Id PK
+        varchar Name
+        int SortOrder
+        boolean IsTerminal
+        boolean IsActive
     }
 
-    TICKETS {
-        uuid id PK
-        bigint ticket_number
-        uuid requester_id FK
-        uuid category_id FK
-        uuid priority_id FK
-        uuid status_id FK
-        uuid assigned_team_id FK
-        uuid assigned_to_user_id FK
-        varchar title
-        text description
-        text cancellation_reason
-        timestamptz due_at
-        timestamptz resolved_at
-        timestamptz closed_at
-        timestamptz created_at
-        timestamptz updated_at
+    Tickets {
+        uuid Id PK
+        bigint TicketNumber
+        uuid RequesterId FK
+        uuid CategoryId FK
+        uuid PriorityId FK
+        uuid StatusId FK
+        uuid AssignedTeamId FK
+        uuid AssignedToUserId FK
+        varchar Title
+        text Description
+        text CancellationReason
+        timestamptz DueAt
+        timestamptz ResolvedAt
+        timestamptz ClosedAt
+        timestamptz CreatedAt
+        timestamptz UpdatedAt
     }
 
-    TICKET_ASSIGNMENT_HISTORY {
-        uuid id PK
-        uuid ticket_id FK
-        uuid assigned_team_id FK
-        uuid assigned_to_user_id FK
-        uuid assigned_by_user_id FK
-        text note
-        timestamptz created_at
+    TicketAssignmentHistory {
+        uuid Id PK
+        uuid TicketId FK
+        uuid AssignedTeamId FK
+        uuid AssignedToUserId FK
+        uuid AssignedByUserId FK
+        text Note
+        timestamptz CreatedAt
     }
 
-    TICKET_COMMENTS {
-        uuid id PK
-        uuid ticket_id FK
-        uuid author_id FK
-        text body
-        boolean is_internal
-        timestamptz created_at
+    TicketComments {
+        uuid Id PK
+        uuid TicketId FK
+        uuid AuthorId FK
+        text Body
+        boolean IsInternal
+        timestamptz CreatedAt
     }
 
-    TICKET_ATTACHMENTS {
-        uuid id PK
-        uuid ticket_id FK
-        uuid uploaded_by_user_id FK
-        varchar file_name
-        text file_url
-        varchar content_type
-        bigint file_size_bytes
-        timestamptz created_at
+    TicketAttachments {
+        uuid Id PK
+        uuid TicketId FK
+        uuid UploadedByUserId FK
+        varchar FileName
+        text FileUrl
+        varchar ContentType
+        bigint FileSizeBytes
+        timestamptz CreatedAt
     }
 
-    NOTIFICATIONS {
-        uuid id PK
-        uuid user_id FK
-        uuid ticket_id FK
-        varchar title
-        text message
-        boolean is_read
-        timestamptz created_at
-        timestamptz read_at
+    Notifications {
+        uuid Id PK
+        uuid UserId FK
+        uuid TicketId FK
+        varchar Title
+        text Message
+        boolean IsRead
+        timestamptz CreatedAt
+        timestamptz ReadAt
     }
 
-    KNOWLEDGE_BASE_ARTICLES {
-        uuid id PK
-        uuid category_id FK
-        uuid author_id FK
-        varchar title
-        text content
-        boolean is_published
-        timestamptz created_at
-        timestamptz updated_at
+    KnowledgeBaseArticles {
+        uuid Id PK
+        uuid CategoryId FK
+        uuid AuthorId FK
+        varchar Title
+        text Content
+        boolean IsPublished
+        timestamptz CreatedAt
+        timestamptz UpdatedAt
     }
 
-    AI_SUGGESTIONS {
-        uuid id PK
-        uuid ticket_id FK
-        uuid suggested_category_id FK
-        uuid suggested_priority_id FK
-        text suggested_reply
-        numeric confidence_score
-        timestamptz created_at
+    AISuggestions {
+        uuid Id PK
+        uuid TicketId FK
+        uuid SuggestedCategoryId FK
+        uuid SuggestedPriorityId FK
+        text SuggestedReply
+        numeric ConfidenceScore
+        timestamptz CreatedAt
     }
 
-    ACTIVITY_LOGS {
-        uuid id PK
-        uuid ticket_id FK
-        uuid actor_user_id FK
-        varchar action
-        text old_value
-        text new_value
-        text note
-        timestamptz created_at
+    ActivityLogs {
+        uuid Id PK
+        uuid TicketId FK
+        uuid ActorUserId FK
+        varchar Action
+        text OldValue
+        text NewValue
+        text Note
+        timestamptz CreatedAt
     }
 

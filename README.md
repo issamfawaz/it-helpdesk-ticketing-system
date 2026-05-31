@@ -28,7 +28,7 @@ This repository section contains the planning deliverables for Assignment 1, bef
 
 | Deliverable | File |
 | --- | --- |
-| Full assignment report | `docs/assignment1_report.md` |
+| Full assignment report | `docs/IDS_Assignment1_Report.html` |
 | Project proposal | `docs/project_proposal.md` |
 | Frontend component and route plan | `docs/frontend_component_plan.md` |
 | Workflow diagrams | `diagrams/system_workflows.md` |
@@ -36,6 +36,8 @@ This repository section contains the planning deliverables for Assignment 1, bef
 | ERD diagram | `diagrams/erd.mmd` |
 | PostgreSQL schema | `database/schema.sql` |
 | UI wireframes | `wireframes/wireframes.html` |
+
+Database naming note: the SQL schema uses PascalCase table and column names, such as `Tickets`, `TicketComments`, `TicketId`, and `CreatedAt`, as requested by the instructor.
 
 ## Suggested Repository Structure
 
