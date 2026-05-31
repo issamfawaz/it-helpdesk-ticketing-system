@@ -1,43 +1,39 @@
-# Frontend Setup - Assignment 2
+# IT Helpdesk Ticketing System
 
-Project: IT Help Desk & Ticketing Management System
+Team:
+- Issam Fawaz
+- Adam Diab
 
-Frontend stack:
-- React.js
-- Vite
-- Role-aware login/index pages
+GitHub repository:
+https://github.com/issamfawaz/it-helpdesk-ticketing-system
 
-## What This Frontend Includes
+## Assignment 2
 
-- Login page.
-- Basic authenticated index/dashboard page.
-- Demo accounts for Admin, IT Support Agent, Employee, and Manager.
-- API login call to the ASP.NET Core backend.
-- Local fallback login for demo use before the backend is running.
-- Role-based UI examples after login.
+This submission includes the project setup, authentication structure, and role management setup for the IT Help Desk & Ticketing Management System.
 
-## Demo Login Accounts
+## Included
+
+- React frontend setup
+- ASP.NET Core Web API setup
+- PostgreSQL connection configuration
+- JWT authentication structure
+- Role-based authorization policies
+- Login/index pages
+- Demo accounts for Admin, IT Support Agent, Employee, and Manager
+
+## Main Files
+
+- `docs/assignment2_report.md`
+- `backend/Helpdesk.Api`
+- `frontend`
+- `database/schema.sql`
+- `diagrams/erd.mmd`
+
+## Demo Accounts
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Admin | `admin@company.com` | `Admin123!` |
-| IT Support Agent | `adam.diab@company.com` | `Agent123!` |
-| Employee | `issam.fawaz@company.com` | `Employee123!` |
-| Manager | `manager@company.com` | `Manager123!` |
-
-## Run Commands
-
-Install Node.js first, then run:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The frontend expects the API base URL from:
-
-```text
-VITE_API_BASE_URL=https://localhost:5001/api
-```
-
+| Admin | admin@company.com | Admin123! |
+| IT Support Agent | adam.diab@company.com | Agent123! |
+| Employee | issam.fawaz@company.com | Employee123! |
+| Manager | manager@company.com | Manager123! |
