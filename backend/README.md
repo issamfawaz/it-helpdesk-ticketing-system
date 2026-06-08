@@ -23,6 +23,14 @@ Backend stack:
 - Current user endpoint:
   - `GET /api/auth/me`
 - Protected sample ticket endpoints.
+- Assignment 3 ticket CRUD endpoints:
+  - `GET /api/tickets`
+  - `GET /api/tickets/{id}`
+  - `POST /api/tickets`
+  - `PUT /api/tickets/{id}`
+  - `DELETE /api/tickets/{id}`
+- Ticket category endpoint:
+  - `GET /api/categories`
 
 ## Demo Login Accounts
 
@@ -45,3 +53,6 @@ dotnet run
 
 The API should run on a local ASP.NET Core port and accept requests from the React frontend at `http://localhost:5173`.
 
+## Assignment 3 Note
+
+Ticket CRUD is implemented through `TicketsController`, `CategoriesController`, and `InMemoryTicketService`. This keeps the assignment reviewable before full database persistence is connected in a later milestone.
