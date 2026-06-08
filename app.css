@@ -1,0 +1,513 @@
+:root {
+  --ink: #172033;
+  --muted: #637083;
+  --line: #d9e0ea;
+  --soft: #f5f7fb;
+  --panel: #ffffff;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --green: #0f766e;
+  --amber: #b45309;
+  --red: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--soft);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+textarea,
+select {
+  font: inherit;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+}
+
+.auth-intro {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  padding: 56px;
+  background: #eef4ff;
+}
+
+.auth-intro h1,
+.dashboard-page h1,
+.content-panel h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.auth-intro h1 {
+  max-width: 620px;
+  font-size: 44px;
+  line-height: 1.08;
+}
+
+.auth-intro p {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  color: var(--blue-dark);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.login-panel {
+  display: grid;
+  align-content: center;
+  gap: 20px;
+  padding: 36px;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+}
+
+.login-panel h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--ink);
+}
+
+.login-form button,
+.secondary-button {
+  min-height: 42px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--blue);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button {
+  background: #ffffff;
+  color: var(--blue-dark);
+  border-color: #bfd0ff;
+  padding: 0 14px;
+}
+
+.error-text {
+  margin: 0;
+  color: var(--red);
+  font-size: 13px;
+}
+
+.demo-box {
+  display: grid;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.demo-account {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.demo-account small {
+  color: var(--muted);
+}
+
+.dashboard-page {
+  min-height: 100vh;
+  padding: 28px;
+  display: grid;
+  gap: 22px;
+  align-content: start;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.topbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #eaf1ff;
+  color: var(--blue-dark);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.role-badge.admin {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.role-badge.it-support-agent {
+  background: #ecfdf5;
+  color: var(--green);
+}
+
+.role-badge.manager {
+  background: #fff7ed;
+  color: var(--amber);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.summary-card,
+.content-panel {
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.summary-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.summary-card p,
+.content-panel p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.content-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.permission-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.permission-item {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcff;
+  font-weight: 700;
+}
+
+.ticket-workspace {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.ticket-header h2,
+.ticket-form h3,
+.table-title-row h3 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.ticket-header p {
+  max-width: 680px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.ticket-summary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticket-summary span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: var(--blue-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.ticket-form {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+.ticket-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ticket-form input,
+.ticket-form textarea,
+.ticket-form select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.ticket-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-actions button,
+.table-actions button {
+  min-height: 36px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--blue);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.form-message {
+  margin: 0;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ticket-table-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.table-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.table-title-row span,
+.muted-text {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.responsive-table {
+  overflow-x: auto;
+}
+
+.ticket-table-panel table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ticket-table-panel th,
+.ticket-table-panel td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.ticket-table-panel th {
+  background: #f8fafc;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.ticket-table-panel tr:last-child td {
+  border-bottom: 0;
+}
+
+.priority-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.priority-tag.low {
+  background: #ecfdf5;
+  color: var(--green);
+}
+
+.priority-tag.medium {
+  background: #eef4ff;
+  color: var(--blue-dark);
+}
+
+.priority-tag.high {
+  background: #fff7ed;
+  color: var(--amber);
+}
+
+.priority-tag.critical {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-actions .danger-button {
+  background: #ffffff;
+  border-color: #fecaca;
+  color: var(--red);
+}
+
+@media (max-width: 820px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-intro,
+  .login-panel,
+  .dashboard-page {
+    padding: 20px;
+  }
+
+  .auth-intro h1 {
+    font-size: 32px;
+  }
+
+  .dashboard-grid,
+  .permission-list,
+  .ticket-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
