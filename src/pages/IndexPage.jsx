@@ -1,4 +1,5 @@
 import RoleBadge from "../components/RoleBadge.jsx";
+import TicketManagementPage from "./TicketManagementPage.jsx";
 
 const roleCards = {
   Admin: [
@@ -82,7 +83,8 @@ export default function IndexPage({ session, onLogout }) {
           ))}
         </div>
       </section>
+
+      <TicketManagementPage session={session} />
     </main>
   );
 }
-
