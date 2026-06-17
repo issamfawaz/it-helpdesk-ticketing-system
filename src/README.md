@@ -18,6 +18,8 @@ Frontend stack:
 - Assignment 3 ticket management screen.
 - Ticket create/edit/delete UI.
 - Category dropdown connected through the ticket API service.
+- Assignment 4 ticket workflow screen.
+- Ticket assignment, status timeline, comments, internal notes, and activity history UI.
 
 ## Demo Login Accounts
 
@@ -54,3 +56,15 @@ src/pages/TicketManagementPage.jsx
 ```
 
 The frontend calls the backend APIs when available and uses local fallback data if the backend is not running.
+
+## Assignment 4 Note
+
+Ticket workflow integration is implemented in the same ticket management screen:
+
+```text
+src/api/ticketsApi.js
+src/pages/TicketManagementPage.jsx
+src/styles/app.css
+```
+
+The screen supports assigning tickets to agents, updating ticket status, adding employee replies, adding internal notes for support roles, and showing ticket activity history.
