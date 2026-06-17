@@ -54,6 +54,7 @@ it-helpdesk-ticketing-system/
     IDS_Assignment1_Report.html
     assignment2_report.md
     assignment3_report.md
+    assignment4_report.md
     frontend_component_plan.md
     project_proposal.md
   wireframes/
@@ -165,6 +166,43 @@ Implemented API routes:
 | DELETE | `/api/tickets/{id}` | Delete ticket |
 | GET | `/api/categories` | List ticket categories |
 
+### Assignment 4 - Ticket Assignment, Workflow, Comments, and History
+
+Status: Completed
+
+Main work completed:
+- Built ticket assignment workflow for support agents
+- Added ticket status update workflow logic
+- Added public comments and employee replies
+- Added internal notes for IT Support Agents and Admins
+- Added ticket activity history and audit trail entries
+- Added status timeline UI for selected tickets
+- Connected React workflow controls with backend APIs
+
+Files to review:
+
+| Deliverable | File |
+| --- | --- |
+| Assignment 4 report | `docs/assignment4_report.md` |
+| Ticket workflow controller | `backend/Helpdesk.Api/Controllers/TicketsController.cs` |
+| Ticket workflow service | `backend/Helpdesk.Api/Services/InMemoryTicketService.cs` |
+| Ticket workflow DTOs | `backend/Helpdesk.Api/Models/TicketDtos.cs` |
+| Ticket workflow records | `backend/Helpdesk.Api/Models/TicketRecord.cs` |
+| React ticket API service | `frontend/src/api/ticketsApi.js` |
+| React workflow page | `frontend/src/pages/TicketManagementPage.jsx` |
+| Workflow styling | `frontend/src/styles/app.css` |
+
+Implemented workflow API routes:
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| PATCH | `/api/tickets/{id}/assignment` | Assign ticket to an agent |
+| PATCH | `/api/tickets/{id}/status` | Update ticket workflow status |
+| GET | `/api/tickets/{id}/comments` | View comments and notes |
+| POST | `/api/tickets/{id}/comments` | Add comment or internal note |
+| GET | `/api/tickets/{id}/activity` | View ticket history and audit trail |
+| GET | `/api/tickets/agents` | List available support agents |
+
 ## How To Run Locally
 
 ### Frontend
@@ -199,6 +237,10 @@ Use this checklist before submitting each assignment:
 - Login works with demo accounts
 - Employee account can create tickets
 - IT Support Agent account can edit and delete tickets
+- IT Support Agent account can assign tickets to agents
+- IT Support Agent account can update ticket status
+- Comments and internal notes save correctly
+- Activity history updates after assignment, status changes, and comments
 - Ticket category dropdown works
 - Ticket table updates after create, edit, and delete actions
 - Backend builds successfully
