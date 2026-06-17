@@ -31,6 +31,13 @@ Backend stack:
   - `DELETE /api/tickets/{id}`
 - Ticket category endpoint:
   - `GET /api/categories`
+- Assignment 4 workflow endpoints:
+  - `PATCH /api/tickets/{id}/assignment`
+  - `PATCH /api/tickets/{id}/status`
+  - `GET /api/tickets/{id}/comments`
+  - `POST /api/tickets/{id}/comments`
+  - `GET /api/tickets/{id}/activity`
+  - `GET /api/tickets/agents`
 
 ## Demo Login Accounts
 
@@ -56,3 +63,7 @@ The API should run on a local ASP.NET Core port and accept requests from the Rea
 ## Assignment 3 Note
 
 Ticket CRUD is implemented through `TicketsController`, `CategoriesController`, and `InMemoryTicketService`. This keeps the assignment reviewable before full database persistence is connected in a later milestone.
+
+## Assignment 4 Note
+
+Ticket assignment, status workflow logic, comments, internal notes, and activity history are implemented in `TicketsController` and `InMemoryTicketService`. The workflow uses role-based authorization so only IT Support Agents and Admins can assign tickets, change statuses, and add internal notes.
