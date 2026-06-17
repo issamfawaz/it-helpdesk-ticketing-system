@@ -68,7 +68,7 @@ app.MapControllers();
 app.MapGet("/", () => Results.Ok(new
 {
     Project = "IT Help Desk & Ticketing Management System",
-    Status = "Ticket CRUD API is ready"
+    Status = "Ticket workflow API is ready"
 }));
 
 app.Run();
