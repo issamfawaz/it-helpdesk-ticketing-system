@@ -16,6 +16,8 @@ public record TicketDto(
     string Status,
     string CreatedBy,
     string? AssignedTo,
+    int CommentCount,
+    string LastActivity,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt
 );
@@ -36,3 +38,34 @@ public record UpdateTicketRequest(
     string? AssignedTo
 );
 
+public record AssignTicketRequest(
+    string AssignedTo
+);
+
+public record UpdateTicketStatusRequest(
+    string Status
+);
+
+public record CreateTicketCommentRequest(
+    string Body,
+    bool IsInternalNote
+);
+
+public record TicketCommentDto(
+    Guid Id,
+    Guid TicketId,
+    string Author,
+    string AuthorRole,
+    string Body,
+    bool IsInternalNote,
+    DateTimeOffset CreatedAt
+);
+
+public record TicketActivityDto(
+    Guid Id,
+    Guid TicketId,
+    string Action,
+    string Description,
+    string Actor,
+    DateTimeOffset CreatedAt
+);

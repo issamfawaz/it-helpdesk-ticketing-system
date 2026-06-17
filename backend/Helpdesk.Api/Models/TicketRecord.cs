@@ -15,3 +15,23 @@ public class TicketRecord
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
+public class TicketCommentRecord
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TicketId { get; set; }
+    public string Author { get; set; } = string.Empty;
+    public string AuthorRole { get; set; } = "Employee";
+    public string Body { get; set; } = string.Empty;
+    public bool IsInternalNote { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class TicketActivityRecord
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TicketId { get; set; }
+    public string Action { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Actor { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
