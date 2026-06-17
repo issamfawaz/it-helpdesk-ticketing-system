@@ -24,6 +24,13 @@ public class TicketsController : ControllerBase
         return Ok(_ticketService.GetTickets());
     }
 
+    [HttpGet("agents")]
+    [Authorize(Policy = "AgentOrAdmin")]
+    public ActionResult<IReadOnlyList<string>> GetAgents()
+    {
+        return Ok(_ticketService.GetAgents());
+    }
+
     [HttpGet("{id:guid}")]
     public ActionResult<TicketDto> GetTicket(Guid id)
     {
@@ -45,13 +52,9 @@ public class TicketsController : ControllerBase
             return BadRequest(new { Message = "Title and description are required." });
         }
 
-        var createdBy = User.Identity?.Name
-            ?? User.FindFirstValue(ClaimTypes.Email)
-            ?? "Authenticated User";
-
         try
         {
-            var ticket = _ticketService.CreateTicket(request, createdBy);
+            var ticket = _ticketService.CreateTicket(request, GetActorName());
             return CreatedAtAction(nameof(GetTicket), new { id = ticket.Id }, ticket);
         }
         catch (ArgumentException exception)
@@ -71,7 +74,7 @@ public class TicketsController : ControllerBase
 
         try
         {
-            var ticket = _ticketService.UpdateTicket(id, request);
+            var ticket = _ticketService.UpdateTicket(id, request, GetActorName());
 
             if (ticket is null)
             {
@@ -84,6 +87,103 @@ public class TicketsController : ControllerBase
         {
             return BadRequest(new { exception.Message });
         }
+    }
+
+    [HttpPatch("{id:guid}/assignment")]
+    [Authorize(Policy = "AgentOrAdmin")]
+    public ActionResult<TicketDto> AssignTicket(Guid id, AssignTicketRequest request)
+    {
+        try
+        {
+            var ticket = _ticketService.AssignTicket(id, request, GetActorName());
+
+            if (ticket is null)
+            {
+                return NotFound(new { Message = "Ticket was not found." });
+            }
+
+            return Ok(ticket);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { exception.Message });
+        }
+    }
+
+    [HttpPatch("{id:guid}/status")]
+    [Authorize(Policy = "AgentOrAdmin")]
+    public ActionResult<TicketDto> UpdateTicketStatus(Guid id, UpdateTicketStatusRequest request)
+    {
+        try
+        {
+            var ticket = _ticketService.UpdateTicketStatus(id, request, GetActorName());
+
+            if (ticket is null)
+            {
+                return NotFound(new { Message = "Ticket was not found." });
+            }
+
+            return Ok(ticket);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { exception.Message });
+        }
+    }
+
+    [HttpGet("{id:guid}/comments")]
+    public ActionResult<IReadOnlyList<TicketCommentDto>> GetComments(Guid id)
+    {
+        var comments = _ticketService.GetComments(id, CanViewInternalNotes());
+
+        if (comments is null)
+        {
+            return NotFound(new { Message = "Ticket was not found." });
+        }
+
+        return Ok(comments);
+    }
+
+    [HttpPost("{id:guid}/comments")]
+    public ActionResult<TicketCommentDto> AddComment(Guid id, CreateTicketCommentRequest request)
+    {
+        if (request.IsInternalNote && !CanViewInternalNotes())
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var comment = _ticketService.AddComment(id, request, GetActorName(), GetActorRole());
+
+            if (comment is null)
+            {
+                return NotFound(new { Message = "Ticket was not found." });
+            }
+
+            return CreatedAtAction(nameof(GetComments), new { id }, comment);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { exception.Message });
+        }
+    }
+
+    [HttpGet("{id:guid}/activity")]
+    public ActionResult<IReadOnlyList<TicketActivityDto>> GetActivity(Guid id)
+    {
+        var activity = _ticketService.GetActivity(id);
+
+        if (activity is null)
+        {
+            return NotFound(new { Message = "Ticket was not found." });
+        }
+
+        return Ok(activity);
     }
 
     [HttpDelete("{id:guid}")]
@@ -120,5 +220,22 @@ public class TicketsController : ControllerBase
             ResolvedOrClosedTickets = tickets.Count(ticket => ticket.Status is "Resolved" or "Closed")
         });
     }
-}
 
+    private string GetActorName()
+    {
+        return User.Identity?.Name
+            ?? User.FindFirstValue(ClaimTypes.Email)
+            ?? "Authenticated User";
+    }
+
+    private string GetActorRole()
+    {
+        return User.FindFirstValue(ClaimTypes.Role) ?? "Employee";
+    }
+
+    private bool CanViewInternalNotes()
+    {
+        var role = GetActorRole();
+        return role is "Admin" or "IT Support Agent";
+    }
+}
