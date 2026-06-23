@@ -2,6 +2,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:500
 const TICKETS_KEY = "helpdesk_demo_tickets";
 const COMMENTS_KEY = "helpdesk_demo_comments";
 const ACTIVITY_KEY = "helpdesk_demo_activity";
+const ATTACHMENTS_KEY = "helpdesk_demo_attachments";
+const NOTIFICATIONS_KEY = "helpdesk_demo_notifications";
 
 const defaultCategories = [
   {
@@ -50,6 +52,7 @@ const defaultTickets = [
     createdBy: "Issam Fawaz",
     assignedTo: "Adam Diab",
     commentCount: 2,
+    attachmentCount: 1,
     lastActivity: "Status changed from Open to In Progress.",
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
@@ -65,6 +68,7 @@ const defaultTickets = [
     createdBy: "Issam Fawaz",
     assignedTo: "Security Team",
     commentCount: 1,
+    attachmentCount: 1,
     lastActivity: "Status changed from Open to Pending.",
     createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
@@ -80,6 +84,7 @@ const defaultTickets = [
     createdBy: "Issam Fawaz",
     assignedTo: "IT Support",
     commentCount: 0,
+    attachmentCount: 0,
     lastActivity: "Ticket closed after software installation was completed.",
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString()
@@ -169,6 +174,61 @@ const defaultActivity = {
   ]
 };
 
+const defaultAttachments = {
+  "20000000-0000-0000-0000-000000000001": [
+    {
+      id: "50000000-0000-0000-0000-000000000001",
+      ticketId: "20000000-0000-0000-0000-000000000001",
+      fileName: "wifi-error-screenshot.png",
+      fileSize: 348200,
+      contentType: "image/png",
+      uploadedBy: "Issam Fawaz",
+      uploadedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+    }
+  ],
+  "20000000-0000-0000-0000-000000000002": [
+    {
+      id: "50000000-0000-0000-0000-000000000002",
+      ticketId: "20000000-0000-0000-0000-000000000002",
+      fileName: "mailbox-error-log.txt",
+      fileSize: 42700,
+      contentType: "text/plain",
+      uploadedBy: "Security Team",
+      uploadedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    }
+  ]
+};
+
+const defaultNotifications = [
+  {
+    id: "60000000-0000-0000-0000-000000000001",
+    ticketId: "20000000-0000-0000-0000-000000000001",
+    title: "High priority ticket assigned",
+    message: "Ticket #1042 is assigned to Adam Diab and is currently in progress.",
+    type: "Assignment",
+    isRead: false,
+    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: "60000000-0000-0000-0000-000000000002",
+    ticketId: "20000000-0000-0000-0000-000000000002",
+    title: "Ticket waiting for confirmation",
+    message: "Ticket #1038 is pending identity confirmation before password reset.",
+    type: "Status",
+    isRead: false,
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: "60000000-0000-0000-0000-000000000003",
+    ticketId: "20000000-0000-0000-0000-000000000003",
+    title: "Ticket closed",
+    message: "Ticket #1025 was closed after software installation was completed.",
+    type: "Resolution",
+    isRead: true,
+    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
 function authHeaders(session) {
   return {
     "Content-Type": "application/json",
@@ -209,6 +269,22 @@ function writeDemoActivity(activity) {
   writeStoredJson(ACTIVITY_KEY, activity);
 }
 
+function readDemoAttachments() {
+  return readStoredJson(ATTACHMENTS_KEY, defaultAttachments);
+}
+
+function writeDemoAttachments(attachments) {
+  writeStoredJson(ATTACHMENTS_KEY, attachments);
+}
+
+function readDemoNotifications() {
+  return readStoredJson(NOTIFICATIONS_KEY, defaultNotifications).map(normalizeNotification);
+}
+
+function writeDemoNotifications(notifications) {
+  writeStoredJson(NOTIFICATIONS_KEY, notifications);
+}
+
 function normalizeTicket(ticket) {
   return {
     id: ticket.id ?? ticket.Id,
@@ -221,6 +297,7 @@ function normalizeTicket(ticket) {
     createdBy: ticket.createdBy ?? ticket.CreatedBy,
     assignedTo: ticket.assignedTo ?? ticket.AssignedTo ?? null,
     commentCount: ticket.commentCount ?? ticket.CommentCount ?? 0,
+    attachmentCount: ticket.attachmentCount ?? ticket.AttachmentCount ?? 0,
     lastActivity: ticket.lastActivity ?? ticket.LastActivity ?? "No activity recorded yet.",
     createdAt: ticket.createdAt ?? ticket.CreatedAt,
     updatedAt: ticket.updatedAt ?? ticket.UpdatedAt
@@ -247,6 +324,64 @@ function normalizeActivity(activity) {
     description: activity.description ?? activity.Description,
     actor: activity.actor ?? activity.Actor,
     createdAt: activity.createdAt ?? activity.CreatedAt
+  };
+}
+
+function normalizeAttachment(attachment) {
+  return {
+    id: attachment.id ?? attachment.Id,
+    ticketId: attachment.ticketId ?? attachment.TicketId,
+    fileName: attachment.fileName ?? attachment.FileName,
+    fileSize: attachment.fileSize ?? attachment.FileSize,
+    contentType: attachment.contentType ?? attachment.ContentType,
+    uploadedBy: attachment.uploadedBy ?? attachment.UploadedBy,
+    uploadedAt: attachment.uploadedAt ?? attachment.UploadedAt
+  };
+}
+
+function normalizeNotification(notification) {
+  return {
+    id: notification.id ?? notification.Id,
+    ticketId: notification.ticketId ?? notification.TicketId ?? null,
+    title: notification.title ?? notification.Title,
+    message: notification.message ?? notification.Message,
+    type: notification.type ?? notification.Type,
+    isRead: notification.isRead ?? notification.IsRead ?? false,
+    createdAt: notification.createdAt ?? notification.CreatedAt
+  };
+}
+
+function buildSlices(tickets, field, knownValues) {
+  return knownValues
+    .map((name) => ({
+      name,
+      value: tickets.filter((ticket) => ticket[field] === name).length
+    }))
+    .filter((slice) => slice.value > 0);
+}
+
+function buildDemoDashboard() {
+  const tickets = readDemoTickets();
+  const attachments = readDemoAttachments();
+  const notifications = readDemoNotifications();
+  const agents = defaultAgents;
+
+  return {
+    totalTickets: tickets.length,
+    openTickets: tickets.filter((ticket) => ticket.status === "Open").length,
+    pendingTickets: tickets.filter((ticket) => ticket.status === "Pending").length,
+    resolvedTickets: tickets.filter((ticket) => ["Resolved", "Closed"].includes(ticket.status)).length,
+    criticalTickets: tickets.filter((ticket) => ticket.priority === "Critical").length,
+    attachmentCount: Object.values(attachments).flat().length,
+    unreadNotifications: notifications.filter((notification) => !notification.isRead).length,
+    ticketsByStatus: buildSlices(tickets, "status", ["Open", "In Progress", "Pending", "Resolved", "Closed"]),
+    ticketsByCategory: buildSlices(tickets, "category", defaultCategories.map((category) => category.name)),
+    ticketsByPriority: buildSlices(tickets, "priority", ["Low", "Medium", "High", "Critical"]),
+    agentWorkload: agents.map((agent) => ({
+      agent,
+      assignedTickets: tickets.filter((ticket) => ticket.assignedTo === agent && ticket.status !== "Closed").length,
+      resolvedTickets: tickets.filter((ticket) => ticket.assignedTo === agent && ["Resolved", "Closed"].includes(ticket.status)).length
+    }))
   };
 }
 
@@ -301,6 +436,22 @@ function appendDemoActivity(ticketId, action, description, actor) {
   return nextActivity;
 }
 
+function appendDemoNotification(ticketId, title, message, type) {
+  const notifications = readDemoNotifications();
+  const nextNotification = {
+    id: crypto.randomUUID(),
+    ticketId,
+    title,
+    message,
+    type,
+    isRead: false,
+    createdAt: new Date().toISOString()
+  };
+
+  writeDemoNotifications([nextNotification, ...notifications]);
+  return nextNotification;
+}
+
 export async function getCategories(session) {
   try {
     return await apiRequest("/categories", {
@@ -318,6 +469,44 @@ export async function getAgents(session) {
     });
   } catch {
     return defaultAgents;
+  }
+}
+
+export async function getDashboardAnalytics(session) {
+  try {
+    return await apiRequest("/tickets/dashboard", {
+      headers: authHeaders(session)
+    });
+  } catch {
+    return buildDemoDashboard();
+  }
+}
+
+export async function getNotifications(session) {
+  try {
+    const notifications = await apiRequest("/notifications", {
+      headers: authHeaders(session)
+    });
+
+    return notifications.map(normalizeNotification);
+  } catch {
+    return readDemoNotifications();
+  }
+}
+
+export async function markNotificationRead(session, notificationId) {
+  try {
+    return normalizeNotification(await apiRequest(`/notifications/${notificationId}/read`, {
+      method: "PATCH",
+      headers: authHeaders(session)
+    }));
+  } catch {
+    const notifications = readDemoNotifications().map((notification) =>
+      notification.id === notificationId ? { ...notification, isRead: true } : notification
+    );
+
+    writeDemoNotifications(notifications);
+    return notifications.find((notification) => notification.id === notificationId);
   }
 }
 
@@ -362,6 +551,18 @@ export async function getTicketActivity(session, ticketId) {
   }
 }
 
+export async function getTicketAttachments(session, ticketId) {
+  try {
+    const attachments = await apiRequest(`/tickets/${ticketId}/attachments`, {
+      headers: authHeaders(session)
+    });
+
+    return attachments.map(normalizeAttachment);
+  } catch {
+    return (readDemoAttachments()[ticketId] ?? []).map(normalizeAttachment);
+  }
+}
+
 export async function createTicket(session, payload) {
   try {
     return normalizeTicket(await apiRequest("/tickets", {
@@ -403,6 +604,12 @@ export async function createTicket(session, payload) {
       }
     ];
     writeDemoActivity(activity);
+    appendDemoNotification(
+      nextTicket.id,
+      "New support ticket",
+      `Ticket #${nextTicket.ticketNumber} was created by ${session.fullName}.`,
+      "Ticket"
+    );
 
     return nextTicket;
   }
@@ -430,6 +637,7 @@ export async function updateTicket(session, ticketId, payload) {
     }));
 
     appendDemoActivity(ticketId, "Ticket Updated", `${session.fullName} updated ticket details.`, session.fullName);
+    appendDemoNotification(ticketId, "Ticket updated", `${session.fullName} updated a ticket.`, "Ticket");
     return updated;
   }
 }
@@ -451,6 +659,7 @@ export async function assignTicket(session, ticketId, payload) {
     }));
 
     appendDemoActivity(ticketId, "Assignment Changed", `Ticket assigned to ${payload.assignedTo}.`, session.fullName);
+    appendDemoNotification(ticketId, "Ticket assigned", `Ticket was assigned to ${payload.assignedTo}.`, "Assignment");
 
     if (updated?.status === "In Progress") {
       appendDemoActivity(ticketId, "Status Changed", "Status changed to In Progress after assignment.", session.fullName);
@@ -476,6 +685,7 @@ export async function updateTicketStatus(session, ticketId, payload) {
     }));
 
     appendDemoActivity(ticketId, "Status Changed", `Status changed to ${payload.status}.`, session.fullName);
+    appendDemoNotification(ticketId, "Ticket status changed", `Status changed to ${payload.status}.`, "Status");
     return updated;
   }
 }
@@ -516,8 +726,56 @@ export async function addTicketComment(session, ticketId, payload) {
       `${session.fullName} added ${payload.isInternalNote ? "an internal note" : "a comment"}.`,
       session.fullName
     );
+    appendDemoNotification(
+      ticketId,
+      payload.isInternalNote ? "Internal note added" : "Comment added",
+      `${session.fullName} added ${payload.isInternalNote ? "an internal note" : "a comment"}.`,
+      "Comment"
+    );
 
     return nextComment;
+  }
+}
+
+export async function uploadTicketAttachment(session, ticketId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    return normalizeAttachment(await apiRequest(`/tickets/${ticketId}/attachments`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.token}`
+      },
+      body: formData
+    }));
+  } catch {
+    const attachments = readDemoAttachments();
+    const now = new Date().toISOString();
+    const nextAttachment = {
+      id: crypto.randomUUID(),
+      ticketId,
+      fileName: file.name,
+      fileSize: file.size,
+      contentType: file.type || "application/octet-stream",
+      uploadedBy: session.fullName,
+      uploadedAt: now
+    };
+
+    attachments[ticketId] = [nextAttachment, ...(attachments[ticketId] ?? [])];
+    writeDemoAttachments(attachments);
+
+    updateStoredTicket(ticketId, (ticket) => ({
+      ...ticket,
+      attachmentCount: (ticket.attachmentCount ?? 0) + 1,
+      lastActivity: `${session.fullName} uploaded ${file.name}.`,
+      updatedAt: now
+    }));
+
+    appendDemoActivity(ticketId, "Attachment Added", `${session.fullName} uploaded ${file.name}.`, session.fullName);
+    appendDemoNotification(ticketId, "Attachment uploaded", `${session.fullName} uploaded ${file.name}.`, "Attachment");
+
+    return nextAttachment;
   }
 }
 
@@ -531,12 +789,15 @@ export async function deleteTicket(session, ticketId) {
     const tickets = readDemoTickets().filter((ticket) => ticket.id !== ticketId);
     const comments = readDemoComments();
     const activity = readDemoActivity();
+    const attachments = readDemoAttachments();
 
     delete comments[ticketId];
     delete activity[ticketId];
+    delete attachments[ticketId];
 
     writeDemoTickets(tickets);
     writeDemoComments(comments);
     writeDemoActivity(activity);
+    writeDemoAttachments(attachments);
   }
 }
