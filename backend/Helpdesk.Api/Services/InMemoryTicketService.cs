@@ -38,6 +38,8 @@ public class InMemoryTicketService : ITicketService
     private readonly List<TicketRecord> _tickets;
     private readonly List<TicketCommentRecord> _comments;
     private readonly List<TicketActivityRecord> _activity;
+    private readonly List<TicketAttachmentRecord> _attachments;
+    private readonly List<NotificationRecord> _notifications;
     private long _nextTicketNumber = 1045;
 
     public InMemoryTicketService()
@@ -170,6 +172,64 @@ public class InMemoryTicketService : ITicketService
                 CreatedAt = DateTimeOffset.UtcNow.AddDays(-6)
             }
         ];
+
+        _attachments =
+        [
+            new TicketAttachmentRecord
+            {
+                Id = Guid.Parse("50000000-0000-0000-0000-000000000001"),
+                TicketId = Guid.Parse("20000000-0000-0000-0000-000000000001"),
+                FileName = "wifi-error-screenshot.png",
+                FileSize = 348_200,
+                ContentType = "image/png",
+                UploadedBy = "Issam Fawaz",
+                UploadedAt = DateTimeOffset.UtcNow.AddHours(-5)
+            },
+            new TicketAttachmentRecord
+            {
+                Id = Guid.Parse("50000000-0000-0000-0000-000000000002"),
+                TicketId = Guid.Parse("20000000-0000-0000-0000-000000000002"),
+                FileName = "mailbox-error-log.txt",
+                FileSize = 42_700,
+                ContentType = "text/plain",
+                UploadedBy = "Security Team",
+                UploadedAt = DateTimeOffset.UtcNow.AddDays(-1)
+            }
+        ];
+
+        _notifications =
+        [
+            new NotificationRecord
+            {
+                Id = Guid.Parse("60000000-0000-0000-0000-000000000001"),
+                TicketId = Guid.Parse("20000000-0000-0000-0000-000000000001"),
+                Title = "High priority ticket assigned",
+                Message = "Ticket #1042 is assigned to Adam Diab and is currently in progress.",
+                Type = "Assignment",
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow.AddHours(-3)
+            },
+            new NotificationRecord
+            {
+                Id = Guid.Parse("60000000-0000-0000-0000-000000000002"),
+                TicketId = Guid.Parse("20000000-0000-0000-0000-000000000002"),
+                Title = "Ticket waiting for confirmation",
+                Message = "Ticket #1038 is pending identity confirmation before password reset.",
+                Type = "Status",
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-1)
+            },
+            new NotificationRecord
+            {
+                Id = Guid.Parse("60000000-0000-0000-0000-000000000003"),
+                TicketId = Guid.Parse("20000000-0000-0000-0000-000000000003"),
+                Title = "Ticket closed",
+                Message = "Ticket #1025 was closed after software installation was completed.",
+                Type = "Resolution",
+                IsRead = true,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-6)
+            }
+        ];
     }
 
     public IReadOnlyList<TicketDto> GetTickets()
@@ -188,6 +248,52 @@ public class InMemoryTicketService : ITicketService
     public IReadOnlyList<string> GetAgents()
     {
         return _agents;
+    }
+
+    public DashboardAnalyticsDto GetDashboardAnalytics()
+    {
+        var tickets = GetTickets();
+
+        return new DashboardAnalyticsDto(
+            tickets.Count,
+            tickets.Count(ticket => ticket.Status == "Open"),
+            tickets.Count(ticket => ticket.Status == "Pending"),
+            tickets.Count(ticket => ticket.Status is "Resolved" or "Closed"),
+            tickets.Count(ticket => ticket.Priority == "Critical"),
+            _attachments.Count,
+            _notifications.Count(notification => !notification.IsRead),
+            BuildSlices(tickets, ticket => ticket.Status, ValidStatuses),
+            BuildSlices(tickets, ticket => ticket.Category, _categories.Select(category => category.Name)),
+            BuildSlices(tickets, ticket => ticket.Priority, ValidPriorities),
+            _agents
+                .Select(agent => new AgentWorkloadDto(
+                    agent,
+                    tickets.Count(ticket => ticket.AssignedTo == agent && ticket.Status != "Closed"),
+                    tickets.Count(ticket => ticket.AssignedTo == agent && ticket.Status is "Resolved" or "Closed")
+                ))
+                .ToList()
+        );
+    }
+
+    public IReadOnlyList<NotificationDto> GetNotifications()
+    {
+        return _notifications
+            .OrderByDescending(notification => notification.CreatedAt)
+            .Select(ToDto)
+            .ToList();
+    }
+
+    public NotificationDto? MarkNotificationRead(Guid id)
+    {
+        var notification = _notifications.FirstOrDefault(item => item.Id == id);
+
+        if (notification is null)
+        {
+            return null;
+        }
+
+        notification.IsRead = true;
+        return ToDto(notification);
     }
 
     public TicketDto? GetTicket(Guid id)
@@ -219,6 +325,7 @@ public class InMemoryTicketService : ITicketService
 
         _tickets.Add(ticket);
         AddActivity(ticket.Id, "Ticket Created", $"Ticket #{ticket.TicketNumber} was created by {createdBy}.", createdBy, now);
+        AddNotification(ticket.Id, "New support ticket", $"Ticket #{ticket.TicketNumber} was created by {createdBy}.", "Ticket", now);
 
         return ToDto(ticket);
     }
@@ -265,6 +372,8 @@ public class InMemoryTicketService : ITicketService
             AddActivity(ticket.Id, "Assignment Changed", $"Ticket assigned to {nextAssignee}.", actor, now);
         }
 
+        AddNotification(ticket.Id, "Ticket updated", $"Ticket #{ticket.TicketNumber} was updated by {actor}.", "Ticket", now);
+
         return ToDto(ticket);
     }
 
@@ -289,6 +398,7 @@ public class InMemoryTicketService : ITicketService
         ticket.UpdatedAt = now;
 
         AddActivity(ticket.Id, "Assignment Changed", $"Ticket assigned to {assignee}.", actor, now);
+        AddNotification(ticket.Id, "Ticket assigned", $"Ticket #{ticket.TicketNumber} was assigned to {assignee}.", "Assignment", now);
 
         if (ticket.Status == "Open")
         {
@@ -323,6 +433,7 @@ public class InMemoryTicketService : ITicketService
         ticket.UpdatedAt = now;
 
         AddActivity(ticket.Id, "Status Changed", $"Status changed from {previousStatus} to {nextStatus}.", actor, now);
+        AddNotification(ticket.Id, "Ticket status changed", $"Ticket #{ticket.TicketNumber} moved from {previousStatus} to {nextStatus}.", "Status", now);
 
         if (nextStatus == "Resolved")
         {
@@ -388,6 +499,7 @@ public class InMemoryTicketService : ITicketService
 
         var action = request.IsInternalNote ? "Internal Note Added" : "Comment Added";
         AddActivity(ticket.Id, action, $"{actor} added {(request.IsInternalNote ? "an internal note" : "a comment")}.", actor, now);
+        AddNotification(ticket.Id, action, $"{actor} added {(request.IsInternalNote ? "an internal note" : "a comment")} to ticket #{ticket.TicketNumber}.", "Comment", now);
 
         return ToDto(comment);
     }
@@ -406,6 +518,73 @@ public class InMemoryTicketService : ITicketService
             .ToList();
     }
 
+    public IReadOnlyList<TicketAttachmentDto>? GetAttachments(Guid ticketId)
+    {
+        if (FindTicket(ticketId) is null)
+        {
+            return null;
+        }
+
+        return _attachments
+            .Where(attachment => attachment.TicketId == ticketId)
+            .OrderByDescending(attachment => attachment.UploadedAt)
+            .Select(ToDto)
+            .ToList();
+    }
+
+    public TicketAttachmentDto? AddAttachment(Guid ticketId, string fileName, long fileSize, string contentType, string uploadedBy)
+    {
+        var ticket = FindTicket(ticketId);
+
+        if (ticket is null)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            throw new ArgumentException("File name is required.");
+        }
+
+        if (fileSize <= 0)
+        {
+            throw new ArgumentException("File cannot be empty.");
+        }
+
+        if (fileSize > 5_000_000)
+        {
+            throw new ArgumentException("File size must be 5 MB or less.");
+        }
+
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".pdf", ".txt", ".doc", ".docx" };
+
+        if (!allowedExtensions.Contains(extension))
+        {
+            throw new ArgumentException("Unsupported file type.");
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        var attachment = new TicketAttachmentRecord
+        {
+            Id = Guid.NewGuid(),
+            TicketId = ticketId,
+            FileName = Path.GetFileName(fileName),
+            FileSize = fileSize,
+            ContentType = string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType,
+            UploadedBy = uploadedBy,
+            UploadedAt = now
+        };
+
+        _attachments.Add(attachment);
+        ticket.UpdatedAt = now;
+
+        AddActivity(ticket.Id, "Attachment Added", $"{uploadedBy} uploaded {attachment.FileName}.", uploadedBy, now);
+        AddNotification(ticket.Id, "Attachment uploaded", $"{uploadedBy} uploaded {attachment.FileName} to ticket #{ticket.TicketNumber}.", "Attachment", now);
+
+        return ToDto(attachment);
+    }
+
     public bool DeleteTicket(Guid id)
     {
         var ticket = FindTicket(id);
@@ -418,6 +597,7 @@ public class InMemoryTicketService : ITicketService
         _tickets.Remove(ticket);
         _comments.RemoveAll(comment => comment.TicketId == id);
         _activity.RemoveAll(activity => activity.TicketId == id);
+        _attachments.RemoveAll(attachment => attachment.TicketId == id);
 
         return true;
     }
@@ -446,6 +626,7 @@ public class InMemoryTicketService : ITicketService
             ticket.CreatedBy,
             ticket.AssignedTo,
             _comments.Count(comment => comment.TicketId == ticket.Id),
+            _attachments.Count(attachment => attachment.TicketId == ticket.Id),
             lastActivity?.Description ?? "No activity recorded yet.",
             ticket.CreatedAt,
             ticket.UpdatedAt
@@ -477,6 +658,32 @@ public class InMemoryTicketService : ITicketService
         );
     }
 
+    private static TicketAttachmentDto ToDto(TicketAttachmentRecord attachment)
+    {
+        return new TicketAttachmentDto(
+            attachment.Id,
+            attachment.TicketId,
+            attachment.FileName,
+            attachment.FileSize,
+            attachment.ContentType,
+            attachment.UploadedBy,
+            attachment.UploadedAt
+        );
+    }
+
+    private static NotificationDto ToDto(NotificationRecord notification)
+    {
+        return new NotificationDto(
+            notification.Id,
+            notification.TicketId,
+            notification.Title,
+            notification.Message,
+            notification.Type,
+            notification.IsRead,
+            notification.CreatedAt
+        );
+    }
+
     private void AddActivity(Guid ticketId, string action, string description, string actor, DateTimeOffset createdAt)
     {
         _activity.Add(new TicketActivityRecord
@@ -488,6 +695,31 @@ public class InMemoryTicketService : ITicketService
             Actor = actor,
             CreatedAt = createdAt
         });
+    }
+
+    private void AddNotification(Guid? ticketId, string title, string message, string type, DateTimeOffset createdAt)
+    {
+        _notifications.Add(new NotificationRecord
+        {
+            Id = Guid.NewGuid(),
+            TicketId = ticketId,
+            Title = title,
+            Message = message,
+            Type = type,
+            IsRead = false,
+            CreatedAt = createdAt
+        });
+    }
+
+    private static IReadOnlyList<DashboardSliceDto> BuildSlices(
+        IReadOnlyList<TicketDto> tickets,
+        Func<TicketDto, string> selector,
+        IEnumerable<string> knownValues)
+    {
+        return knownValues
+            .Select(value => new DashboardSliceDto(value, tickets.Count(ticket => selector(ticket) == value)))
+            .Where(slice => slice.Value > 0)
+            .ToList();
     }
 
     private void ValidateCategory(Guid categoryId)
