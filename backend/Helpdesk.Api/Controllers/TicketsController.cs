@@ -31,6 +31,12 @@ public class TicketsController : ControllerBase
         return Ok(_ticketService.GetAgents());
     }
 
+    [HttpGet("dashboard")]
+    public ActionResult<DashboardAnalyticsDto> GetDashboard()
+    {
+        return Ok(_ticketService.GetDashboardAnalytics());
+    }
+
     [HttpGet("{id:guid}")]
     public ActionResult<TicketDto> GetTicket(Guid id)
     {
@@ -184,6 +190,50 @@ public class TicketsController : ControllerBase
         }
 
         return Ok(activity);
+    }
+
+    [HttpGet("{id:guid}/attachments")]
+    public ActionResult<IReadOnlyList<TicketAttachmentDto>> GetAttachments(Guid id)
+    {
+        var attachments = _ticketService.GetAttachments(id);
+
+        if (attachments is null)
+        {
+            return NotFound(new { Message = "Ticket was not found." });
+        }
+
+        return Ok(attachments);
+    }
+
+    [HttpPost("{id:guid}/attachments")]
+    [RequestSizeLimit(5_000_000)]
+    public ActionResult<TicketAttachmentDto> UploadAttachment(Guid id, [FromForm] IFormFile file)
+    {
+        if (file is null)
+        {
+            return BadRequest(new { Message = "Attachment file is required." });
+        }
+
+        try
+        {
+            var attachment = _ticketService.AddAttachment(
+                id,
+                file.FileName,
+                file.Length,
+                file.ContentType,
+                GetActorName());
+
+            if (attachment is null)
+            {
+                return NotFound(new { Message = "Ticket was not found." });
+            }
+
+            return CreatedAtAction(nameof(GetAttachments), new { id }, attachment);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { exception.Message });
+        }
     }
 
     [HttpDelete("{id:guid}")]
