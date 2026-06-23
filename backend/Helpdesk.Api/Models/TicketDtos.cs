@@ -17,6 +17,7 @@ public record TicketDto(
     string CreatedBy,
     string? AssignedTo,
     int CommentCount,
+    int AttachmentCount,
     string LastActivity,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt
@@ -68,4 +69,49 @@ public record TicketActivityDto(
     string Description,
     string Actor,
     DateTimeOffset CreatedAt
+);
+
+public record TicketAttachmentDto(
+    Guid Id,
+    Guid TicketId,
+    string FileName,
+    long FileSize,
+    string ContentType,
+    string UploadedBy,
+    DateTimeOffset UploadedAt
+);
+
+public record NotificationDto(
+    Guid Id,
+    Guid? TicketId,
+    string Title,
+    string Message,
+    string Type,
+    bool IsRead,
+    DateTimeOffset CreatedAt
+);
+
+public record DashboardSliceDto(
+    string Name,
+    int Value
+);
+
+public record AgentWorkloadDto(
+    string Agent,
+    int AssignedTickets,
+    int ResolvedTickets
+);
+
+public record DashboardAnalyticsDto(
+    int TotalTickets,
+    int OpenTickets,
+    int PendingTickets,
+    int ResolvedTickets,
+    int CriticalTickets,
+    int AttachmentCount,
+    int UnreadNotifications,
+    IReadOnlyList<DashboardSliceDto> TicketsByStatus,
+    IReadOnlyList<DashboardSliceDto> TicketsByCategory,
+    IReadOnlyList<DashboardSliceDto> TicketsByPriority,
+    IReadOnlyList<AgentWorkloadDto> AgentWorkload
 );
