@@ -6,11 +6,16 @@ import {
   deleteTicket,
   getAgents,
   getCategories,
+  getDashboardAnalytics,
+  getNotifications,
   getTicketActivity,
+  getTicketAttachments,
   getTicketComments,
   getTickets,
+  markNotificationRead,
   updateTicket,
-  updateTicketStatus
+  updateTicketStatus,
+  uploadTicketAttachment
 } from "../api/ticketsApi.js";
 
 const emptyForm = {
@@ -29,15 +34,19 @@ const emptyCommentForm = {
 
 const priorities = ["Low", "Medium", "High", "Critical"];
 const statuses = ["Open", "In Progress", "Pending", "Resolved", "Closed"];
+const allowedAttachmentTypes = [".png", ".jpg", ".jpeg", ".pdf", ".txt", ".doc", ".docx"];
 
 export default function TicketManagementPage({ session }) {
   const [tickets, setTickets] = useState([]);
   const [categories, setCategories] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [commentForm, setCommentForm] = useState(emptyCommentForm);
   const [comments, setComments] = useState([]);
   const [activity, setActivity] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
   const [editingTicketId, setEditingTicketId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,15 +68,19 @@ export default function TicketManagementPage({ session }) {
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
-      const [nextCategories, nextTickets, nextAgents] = await Promise.all([
+      const [nextCategories, nextTickets, nextAgents, nextDashboard, nextNotifications] = await Promise.all([
         getCategories(session),
         getTickets(session),
-        getAgents(session)
+        getAgents(session),
+        getDashboardAnalytics(session),
+        getNotifications(session)
       ]);
 
       setCategories(nextCategories);
       setTickets(nextTickets);
       setAgents(nextAgents);
+      setDashboard(nextDashboard);
+      setNotifications(nextNotifications);
       setForm((currentForm) => ({
         ...currentForm,
         categoryId: nextCategories[0]?.id ?? ""
@@ -86,6 +99,7 @@ export default function TicketManagementPage({ session }) {
     if (!selectedTicketId) {
       setComments([]);
       setActivity([]);
+      setAttachments([]);
       return;
     }
 
@@ -101,15 +115,27 @@ export default function TicketManagementPage({ session }) {
     };
   }, [tickets]);
 
+  async function refreshDashboardData() {
+    const [nextDashboard, nextNotifications] = await Promise.all([
+      getDashboardAnalytics(session),
+      getNotifications(session)
+    ]);
+
+    setDashboard(nextDashboard);
+    setNotifications(nextNotifications);
+  }
+
   async function loadWorkflowForTicket(ticketId) {
     setIsWorkflowLoading(true);
-    const [nextComments, nextActivity] = await Promise.all([
+    const [nextComments, nextActivity, nextAttachments] = await Promise.all([
       getTicketComments(session, ticketId),
-      getTicketActivity(session, ticketId)
+      getTicketActivity(session, ticketId),
+      getTicketAttachments(session, ticketId)
     ]);
 
     setComments(nextComments);
     setActivity(nextActivity);
+    setAttachments(nextAttachments);
     setIsWorkflowLoading(false);
   }
 
@@ -171,6 +197,7 @@ export default function TicketManagementPage({ session }) {
       setMessage("Ticket updated successfully.");
       resetForm();
       await loadWorkflowForTicket(editingTicketId);
+      await refreshDashboardData();
       return;
     }
 
@@ -179,6 +206,7 @@ export default function TicketManagementPage({ session }) {
     setSelectedTicketId(created.id);
     setMessage("Ticket created successfully.");
     resetForm();
+    await refreshDashboardData();
   }
 
   async function handleDelete(ticketId) {
@@ -194,6 +222,7 @@ export default function TicketManagementPage({ session }) {
       return remainingTickets[0]?.id ?? null;
     });
     setMessage("Ticket deleted successfully.");
+    await refreshDashboardData();
   }
 
   async function handleAssign(assignedTo) {
@@ -205,6 +234,7 @@ export default function TicketManagementPage({ session }) {
     mergeTicket(updated);
     setWorkflowMessage(`Ticket assigned to ${assignedTo}.`);
     await loadWorkflowForTicket(selectedTicket.id);
+    await refreshDashboardData();
   }
 
   async function handleStatusChange(status) {
@@ -216,6 +246,7 @@ export default function TicketManagementPage({ session }) {
     mergeTicket(updated);
     setWorkflowMessage(`Status updated to ${status}.`);
     await loadWorkflowForTicket(selectedTicket.id);
+    await refreshDashboardData();
   }
 
   async function handleAddComment(event) {
@@ -247,6 +278,71 @@ export default function TicketManagementPage({ session }) {
     setCommentForm(emptyCommentForm);
     setWorkflowMessage(created.isInternalNote ? "Internal note added." : "Comment added.");
     await loadWorkflowForTicket(selectedTicket.id);
+    await refreshDashboardData();
+  }
+
+  async function handleUploadAttachment(event) {
+    const file = event.target.files?.[0];
+
+    if (!selectedTicket || !file) {
+      return;
+    }
+
+    const fileName = file.name.toLowerCase();
+    const isAllowedType = allowedAttachmentTypes.some((extension) => fileName.endsWith(extension));
+
+    if (!isAllowedType) {
+      setWorkflowMessage("Unsupported file type. Use PNG, JPG, PDF, TXT, DOC, or DOCX.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5_000_000) {
+      setWorkflowMessage("Attachment must be 5 MB or less.");
+      event.target.value = "";
+      return;
+    }
+
+    const uploaded = await uploadTicketAttachment(session, selectedTicket.id, file);
+    setAttachments((currentAttachments) => [uploaded, ...currentAttachments]);
+    setTickets((currentTickets) =>
+      currentTickets.map((ticket) =>
+        ticket.id === selectedTicket.id
+          ? {
+              ...ticket,
+              attachmentCount: (ticket.attachmentCount ?? 0) + 1,
+              lastActivity: `${session.fullName} uploaded ${uploaded.fileName}.`,
+              updatedAt: uploaded.uploadedAt
+            }
+          : ticket
+      )
+    );
+    setWorkflowMessage("Attachment uploaded.");
+    event.target.value = "";
+    await loadWorkflowForTicket(selectedTicket.id);
+    await refreshDashboardData();
+  }
+
+  async function handleMarkNotificationRead(notificationId) {
+    const updated = await markNotificationRead(session, notificationId);
+
+    if (!updated) {
+      return;
+    }
+
+    setNotifications((currentNotifications) =>
+      currentNotifications.map((notification) =>
+        notification.id === notificationId ? updated : notification
+      )
+    );
+    setDashboard((currentDashboard) =>
+      currentDashboard
+        ? {
+            ...currentDashboard,
+            unreadNotifications: Math.max(currentDashboard.unreadNotifications - 1, 0)
+          }
+        : currentDashboard
+    );
   }
 
   function formatDate(value) {
@@ -258,6 +354,14 @@ export default function TicketManagementPage({ session }) {
     }).format(new Date(value));
   }
 
+  function formatFileSize(bytes) {
+    if (bytes >= 1_000_000) {
+      return `${(bytes / 1_000_000).toFixed(1)} MB`;
+    }
+
+    return `${Math.max(1, Math.round(bytes / 1000))} KB`;
+  }
+
   if (isLoading) {
     return <section className="content-panel">Loading tickets...</section>;
   }
@@ -266,11 +370,11 @@ export default function TicketManagementPage({ session }) {
     <section className="ticket-workspace">
       <div className="ticket-header">
         <div>
-          <span className="eyebrow">Ticket assignment workflow</span>
+          <span className="eyebrow">Dashboard analytics and support operations</span>
           <h2>Ticket Management</h2>
           <p>
-            Assign tickets to agents, update workflow statuses, add replies, record internal notes,
-            and review the ticket history from one workspace.
+            Track KPIs, upload attachments, review notifications, assign tickets, update statuses,
+            and audit support activity from one helpdesk workspace.
           </p>
         </div>
         <div className="ticket-summary">
@@ -280,6 +384,15 @@ export default function TicketManagementPage({ session }) {
           <span>Closed: {summary.closed}</span>
         </div>
       </div>
+
+      {dashboard ? (
+        <DashboardAnalyticsPanel
+          dashboard={dashboard}
+          notifications={notifications}
+          onMarkNotificationRead={handleMarkNotificationRead}
+          formatDate={formatDate}
+        />
+      ) : null}
 
       <div className="ticket-grid">
         <form className="ticket-form" onSubmit={handleSubmit}>
@@ -389,7 +502,7 @@ export default function TicketManagementPage({ session }) {
                   <th>Priority</th>
                   <th>Status</th>
                   <th>Assigned</th>
-                  <th>Comments</th>
+                  <th>Files</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -406,7 +519,7 @@ export default function TicketManagementPage({ session }) {
                     </td>
                     <td>{ticket.status}</td>
                     <td>{ticket.assignedTo ?? "Unassigned"}</td>
-                    <td>{ticket.commentCount ?? 0}</td>
+                    <td>{ticket.attachmentCount ?? 0}</td>
                     <td>
                       <div className="table-actions">
                         <button
@@ -553,6 +666,27 @@ export default function TicketManagementPage({ session }) {
                 </div>
 
                 <div className="workflow-column">
+                  <h4>Attachments</h4>
+                  <label className="attachment-upload">
+                    Upload screenshot or document
+                    <input type="file" onChange={handleUploadAttachment} />
+                  </label>
+                  <div className="attachment-list">
+                    {attachments.length === 0 ? (
+                      <p className="muted-text">No attachments yet.</p>
+                    ) : (
+                      attachments.map((attachment) => (
+                        <article className="attachment-item" key={attachment.id}>
+                          <strong>{attachment.fileName}</strong>
+                          <span>{formatFileSize(attachment.fileSize)}</span>
+                          <small>
+                            {attachment.uploadedBy} · {formatDate(attachment.uploadedAt)}
+                          </small>
+                        </article>
+                      ))
+                    )}
+                  </div>
+
                   <h4>Activity history</h4>
                   {isWorkflowLoading ? (
                     <p className="muted-text">Loading ticket history...</p>
@@ -576,5 +710,100 @@ export default function TicketManagementPage({ session }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function DashboardAnalyticsPanel({ dashboard, notifications, onMarkNotificationRead, formatDate }) {
+  const kpis = [
+    ["Total tickets", dashboard.totalTickets],
+    ["Open", dashboard.openTickets],
+    ["Pending", dashboard.pendingTickets],
+    ["Resolved/Closed", dashboard.resolvedTickets],
+    ["Critical", dashboard.criticalTickets],
+    ["Attachments", dashboard.attachmentCount]
+  ];
+
+  return (
+    <section className="analytics-panel">
+      <div className="kpi-grid">
+        {kpis.map(([label, value]) => (
+          <article className="kpi-card" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </article>
+        ))}
+      </div>
+
+      <div className="analytics-layout">
+        <div className="chart-grid">
+          <ChartBlock title="Tickets by status" data={dashboard.ticketsByStatus} />
+          <ChartBlock title="Tickets by category" data={dashboard.ticketsByCategory} />
+          <ChartBlock title="Tickets by priority" data={dashboard.ticketsByPriority} />
+          <ChartBlock
+            title="Agent workload"
+            data={dashboard.agentWorkload.map((item) => ({
+              name: item.agent,
+              value: item.assignedTickets + item.resolvedTickets
+            }))}
+          />
+        </div>
+
+        <aside className="notification-center">
+          <div className="notification-header">
+            <div>
+              <span className="eyebrow">Notification center</span>
+              <h3>{dashboard.unreadNotifications} unread</h3>
+            </div>
+          </div>
+
+          <div className="notification-list">
+            {notifications.map((notification) => (
+              <article
+                className={`notification-item ${notification.isRead ? "read" : "unread"}`}
+                key={notification.id}
+              >
+                <div>
+                  <strong>{notification.title}</strong>
+                  <p>{notification.message}</p>
+                  <small>
+                    {notification.type} · {formatDate(notification.createdAt)}
+                  </small>
+                </div>
+                {!notification.isRead ? (
+                  <button type="button" onClick={() => onMarkNotificationRead(notification.id)}>
+                    Mark read
+                  </button>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function ChartBlock({ title, data }) {
+  const maxValue = Math.max(...data.map((item) => item.value), 1);
+
+  return (
+    <article className="chart-card">
+      <h3>{title}</h3>
+      <div className="bar-list">
+        {data.length === 0 ? (
+          <p className="muted-text">No data yet.</p>
+        ) : (
+          data.map((item) => (
+            <div className="bar-row" key={item.name}>
+              <span>{item.name}</span>
+              <div className="bar-track">
+                <div className="bar-fill" style={{ width: `${(item.value / maxValue) * 100}%` }} />
+              </div>
+              <strong>{item.value}</strong>
+            </div>
+          ))
+        )}
+      </div>
+    </article>
   );
 }
