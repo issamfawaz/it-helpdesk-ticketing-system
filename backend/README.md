@@ -38,6 +38,12 @@ Backend stack:
   - `POST /api/tickets/{id}/comments`
   - `GET /api/tickets/{id}/activity`
   - `GET /api/tickets/agents`
+- Assignment 5 dashboard, notification, and attachment endpoints:
+  - `GET /api/tickets/dashboard`
+  - `GET /api/notifications`
+  - `PATCH /api/notifications/{id}/read`
+  - `GET /api/tickets/{id}/attachments`
+  - `POST /api/tickets/{id}/attachments`
 
 ## Demo Login Accounts
 
@@ -67,3 +73,7 @@ Ticket CRUD is implemented through `TicketsController`, `CategoriesController`, 
 ## Assignment 4 Note
 
 Ticket assignment, status workflow logic, comments, internal notes, and activity history are implemented in `TicketsController` and `InMemoryTicketService`. The workflow uses role-based authorization so only IT Support Agents and Admins can assign tickets, change statuses, and add internal notes.
+
+## Assignment 5 Note
+
+Dashboard analytics, notification center items, and attachment metadata are implemented through `TicketsController`, `NotificationsController`, and `InMemoryTicketService`. Attachments are validated by file type and size, then stored as in-memory metadata for the assignment demo.
