@@ -55,6 +55,7 @@ it-helpdesk-ticketing-system/
     assignment2_report.md
     assignment3_report.md
     assignment4_report.md
+    assignment5_report.md
     frontend_component_plan.md
     project_proposal.md
   wireframes/
@@ -203,6 +204,43 @@ Implemented workflow API routes:
 | GET | `/api/tickets/{id}/activity` | View ticket history and audit trail |
 | GET | `/api/tickets/agents` | List available support agents |
 
+### Assignment 5 - Dashboard Analytics, Notifications, and File Attachments
+
+Status: Completed
+
+Main work completed:
+- Built dashboard analytics API
+- Added KPI cards for ticket and attachment statistics
+- Added chart-style analytics for status, category, priority, and agent workload
+- Added notification center API
+- Added read/unread notification behavior
+- Added ticket attachment API
+- Added screenshot/document upload UI
+- Added attachment activity log entries
+
+Files to review:
+
+| Deliverable | File |
+| --- | --- |
+| Assignment 5 report | `docs/assignment5_report.md` |
+| Dashboard and attachment routes | `backend/Helpdesk.Api/Controllers/TicketsController.cs` |
+| Notification routes | `backend/Helpdesk.Api/Controllers/NotificationsController.cs` |
+| Analytics/notification/attachment service | `backend/Helpdesk.Api/Services/InMemoryTicketService.cs` |
+| Dashboard and attachment DTOs | `backend/Helpdesk.Api/Models/TicketDtos.cs` |
+| React API integration | `frontend/src/api/ticketsApi.js` |
+| Dashboard and attachment UI | `frontend/src/pages/TicketManagementPage.jsx` |
+| Dashboard styling | `frontend/src/styles/app.css` |
+
+Implemented assignment 5 API routes:
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| GET | `/api/tickets/dashboard` | Return KPI and chart data |
+| GET | `/api/notifications` | Return notification center items |
+| PATCH | `/api/notifications/{id}/read` | Mark notification as read |
+| GET | `/api/tickets/{id}/attachments` | Return ticket attachments |
+| POST | `/api/tickets/{id}/attachments` | Upload screenshot/document metadata |
+
 ## How To Run Locally
 
 ### Frontend
@@ -241,6 +279,9 @@ Use this checklist before submitting each assignment:
 - IT Support Agent account can update ticket status
 - Comments and internal notes save correctly
 - Activity history updates after assignment, status changes, and comments
+- Dashboard KPI cards load correctly
+- Notification center marks items as read
+- Attachment upload accepts supported files and updates the selected ticket
 - Ticket category dropdown works
 - Ticket table updates after create, edit, and delete actions
 - Backend builds successfully
