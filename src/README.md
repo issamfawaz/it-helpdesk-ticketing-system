@@ -20,6 +20,7 @@ Frontend stack:
 - Category dropdown connected through the ticket API service.
 - Assignment 4 ticket workflow screen.
 - Ticket assignment, status timeline, comments, internal notes, and activity history UI.
+- Assignment 5 dashboard analytics, KPI cards, notifications, and attachment upload UI.
 
 ## Demo Login Accounts
 
@@ -68,3 +69,15 @@ src/styles/app.css
 ```
 
 The screen supports assigning tickets to agents, updating ticket status, adding employee replies, adding internal notes for support roles, and showing ticket activity history.
+
+## Assignment 5 Note
+
+Dashboard analytics, notification center, and file attachments are implemented in:
+
+```text
+src/api/ticketsApi.js
+src/pages/TicketManagementPage.jsx
+src/styles/app.css
+```
+
+The screen includes KPI cards, chart-style analytics, unread notification handling, and screenshot/document upload for the selected ticket.
