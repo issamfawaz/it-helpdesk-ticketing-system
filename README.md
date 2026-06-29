@@ -56,6 +56,7 @@ it-helpdesk-ticketing-system/
     assignment3_report.md
     assignment4_report.md
     assignment5_report.md
+    assignment6_report.md
     frontend_component_plan.md
     project_proposal.md
   wireframes/
@@ -241,6 +242,44 @@ Implemented assignment 5 API routes:
 | GET | `/api/tickets/{id}/attachments` | Return ticket attachments |
 | POST | `/api/tickets/{id}/attachments` | Upload screenshot/document metadata |
 
+### Assignment 6 - Reports Export and AI Features
+
+Status: Completed
+
+Main work completed:
+- Added reports export system
+- Added Excel-compatible CSV report export
+- Added printable PDF report view
+- Added AI ticket categorization
+- Added AI priority recommendation
+- Added AI-generated ticket summaries
+- Added AI troubleshooting suggestions
+- Added AI chatbot assistant
+
+Files to review:
+
+| Deliverable | File |
+| --- | --- |
+| Assignment 6 report | `docs/assignment6_report.md` |
+| Reports API controller | `backend/Helpdesk.Api/Controllers/ReportsController.cs` |
+| AI API controller | `backend/Helpdesk.Api/Controllers/AiController.cs` |
+| AI service contract | `backend/Helpdesk.Api/Services/IHelpdeskAiService.cs` |
+| Demo AI service | `backend/Helpdesk.Api/Services/DemoHelpdeskAiService.cs` |
+| AI DTOs | `backend/Helpdesk.Api/Models/AiDtos.cs` |
+| React report and AI API calls | `frontend/src/api/ticketsApi.js` |
+| React report and AI UI | `frontend/src/pages/TicketManagementPage.jsx` |
+| Report and AI styling | `frontend/src/styles/app.css` |
+
+Implemented assignment 6 API routes:
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| GET | `/api/reports/summary` | Return report summary analytics |
+| GET | `/api/reports/export/excel` | Export ticket report as CSV |
+| GET | `/api/reports/export/pdf` | Export printable report view |
+| POST | `/api/ai/analyze-ticket` | Suggest category, priority, summary, and troubleshooting |
+| POST | `/api/ai/chat` | Return AI assistant response |
+
 ## How To Run Locally
 
 ### Frontend
@@ -282,6 +321,9 @@ Use this checklist before submitting each assignment:
 - Dashboard KPI cards load correctly
 - Notification center marks items as read
 - Attachment upload accepts supported files and updates the selected ticket
+- Report export buttons produce PDF/print and Excel-compatible reports
+- AI analyze suggests ticket category and priority
+- AI assistant returns troubleshooting steps
 - Ticket category dropdown works
 - Ticket table updates after create, edit, and delete actions
 - Backend builds successfully
