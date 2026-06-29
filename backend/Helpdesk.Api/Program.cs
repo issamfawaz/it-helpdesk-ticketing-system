@@ -29,6 +29,7 @@ builder.Services.AddDbContext<HelpdeskDbContext>(options =>
 builder.Services.AddScoped<IAuthService, DemoAuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSingleton<ITicketService, InMemoryTicketService>();
+builder.Services.AddSingleton<IHelpdeskAiService, DemoHelpdeskAiService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is missing.");
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -68,7 +69,7 @@ app.MapControllers();
 app.MapGet("/", () => Results.Ok(new
 {
     Project = "IT Help Desk & Ticketing Management System",
-    Status = "Dashboard, notifications, and attachment APIs are ready"
+    Status = "Reports export and AI assistance APIs are ready"
 }));
 
 app.Run();
