@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   addTicketComment,
+  analyzeTicketDraft,
   assignTicket,
+  askAiAssistant,
   createTicket,
   deleteTicket,
+  exportReport,
   getAgents,
   getCategories,
   getDashboardAnalytics,
@@ -53,6 +56,11 @@ export default function TicketManagementPage({ session }) {
   const [isWorkflowLoading, setIsWorkflowLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [workflowMessage, setWorkflowMessage] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiResponse, setAiResponse] = useState(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const canManageTickets = ["Admin", "IT Support Agent"].includes(session.role);
 
@@ -345,6 +353,83 @@ export default function TicketManagementPage({ session }) {
     );
   }
 
+  async function handleExportReport(format) {
+    const report = await exportReport(session, format);
+    const url = URL.createObjectURL(report.blob);
+
+    if (format === "pdf") {
+      window.open(url, "_blank", "noopener,noreferrer");
+      setReportMessage("PDF report opened in a printable view.");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = report.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+    setReportMessage("Excel report downloaded.");
+  }
+
+  async function handleAnalyzeDraft() {
+    if (!form.title.trim() && !form.description.trim()) {
+      setMessage("Add a title or description before using AI analysis.");
+      return;
+    }
+
+    setIsAiLoading(true);
+    const analysis = await analyzeTicketDraft(session, {
+      title: form.title,
+      description: form.description
+    });
+    const category = categories.find((item) => item.name === analysis.suggestedCategory);
+
+    setAiAnalysis(analysis);
+    setForm((currentForm) => ({
+      ...currentForm,
+      categoryId: category?.id ?? currentForm.categoryId,
+      priority: analysis.suggestedPriority
+    }));
+    setMessage("AI suggestion applied to category and priority.");
+    setIsAiLoading(false);
+  }
+
+  async function handleAnalyzeSelectedTicket() {
+    if (!selectedTicket) {
+      return;
+    }
+
+    setIsAiLoading(true);
+    const analysis = await analyzeTicketDraft(session, {
+      title: selectedTicket.title,
+      description: selectedTicket.description
+    });
+
+    setAiAnalysis(analysis);
+    setWorkflowMessage("AI ticket summary generated.");
+    setIsAiLoading(false);
+  }
+
+  async function handleAskAiAssistant(event) {
+    event.preventDefault();
+
+    if (!aiQuestion.trim()) {
+      return;
+    }
+
+    setIsAiLoading(true);
+    const response = await askAiAssistant(session, {
+      message: aiQuestion,
+      ticketTitle: selectedTicket?.title,
+      ticketDescription: selectedTicket?.description,
+      category: selectedTicket?.category
+    });
+
+    setAiResponse(response);
+    setAiQuestion("");
+    setIsAiLoading(false);
+  }
+
   function formatDate(value) {
     return new Intl.DateTimeFormat("en", {
       month: "short",
@@ -393,6 +478,19 @@ export default function TicketManagementPage({ session }) {
           formatDate={formatDate}
         />
       ) : null}
+
+      <ReportsAndAiPanel
+        aiAnalysis={aiAnalysis}
+        aiQuestion={aiQuestion}
+        aiResponse={aiResponse}
+        isAiLoading={isAiLoading}
+        reportMessage={reportMessage}
+        selectedTicket={selectedTicket}
+        onAnalyzeSelectedTicket={handleAnalyzeSelectedTicket}
+        onAskAiAssistant={handleAskAiAssistant}
+        onExportReport={handleExportReport}
+        onQuestionChange={setAiQuestion}
+      />
 
       <div className="ticket-grid">
         <form className="ticket-form" onSubmit={handleSubmit}>
@@ -477,6 +575,9 @@ export default function TicketManagementPage({ session }) {
           {message ? <p className="form-message">{message}</p> : null}
 
           <div className="form-actions">
+            <button className="secondary-button" type="button" onClick={handleAnalyzeDraft}>
+              AI analyze
+            </button>
             <button type="submit">{editingTicketId ? "Update ticket" : "Create ticket"}</button>
             {editingTicketId ? (
               <button className="secondary-button" type="button" onClick={resetForm}>
@@ -680,7 +781,7 @@ export default function TicketManagementPage({ session }) {
                           <strong>{attachment.fileName}</strong>
                           <span>{formatFileSize(attachment.fileSize)}</span>
                           <small>
-                            {attachment.uploadedBy} · {formatDate(attachment.uploadedAt)}
+                            {attachment.uploadedBy} - {formatDate(attachment.uploadedAt)}
                           </small>
                         </article>
                       ))
@@ -697,7 +798,7 @@ export default function TicketManagementPage({ session }) {
                           <span>{item.action}</span>
                           <p>{item.description}</p>
                           <small>
-                            {item.actor} · {formatDate(item.createdAt)}
+                            {item.actor} - {formatDate(item.createdAt)}
                           </small>
                         </article>
                       ))}
@@ -709,6 +810,89 @@ export default function TicketManagementPage({ session }) {
           ) : null}
         </div>
       </div>
+    </section>
+  );
+}
+
+function ReportsAndAiPanel({
+  aiAnalysis,
+  aiQuestion,
+  aiResponse,
+  isAiLoading,
+  reportMessage,
+  selectedTicket,
+  onAnalyzeSelectedTicket,
+  onAskAiAssistant,
+  onExportReport,
+  onQuestionChange
+}) {
+  return (
+    <section className="reports-ai-panel">
+      <article className="report-tools-card">
+        <div>
+          <span className="eyebrow">Reports</span>
+          <h3>Export center</h3>
+        </div>
+        <div className="report-actions">
+          <button type="button" onClick={() => onExportReport("pdf")}>
+            Export PDF
+          </button>
+          <button type="button" onClick={() => onExportReport("excel")}>
+            Export Excel
+          </button>
+        </div>
+        {reportMessage ? <p className="form-message">{reportMessage}</p> : null}
+      </article>
+
+      <article className="ai-tools-card">
+        <div className="ai-tools-header">
+          <div>
+            <span className="eyebrow">AI support assistant</span>
+            <h3>{selectedTicket ? `Ticket #${selectedTicket.ticketNumber}` : "Ticket helper"}</h3>
+          </div>
+          <button type="button" onClick={onAnalyzeSelectedTicket} disabled={!selectedTicket || isAiLoading}>
+            AI summary
+          </button>
+        </div>
+
+        {aiAnalysis ? (
+          <div className="ai-result-card">
+            <div className="ai-result-meta">
+              <span>{aiAnalysis.suggestedCategory}</span>
+              <span>{aiAnalysis.suggestedPriority}</span>
+              <span>{Math.round(aiAnalysis.confidence * 100)}%</span>
+            </div>
+            <p>{aiAnalysis.summary}</p>
+            <ul>
+              {(aiAnalysis.troubleshootingSuggestions ?? []).map((suggestion) => (
+                <li key={suggestion}>{suggestion}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        <form className="ai-chat-form" onSubmit={onAskAiAssistant}>
+          <input
+            value={aiQuestion}
+            onChange={(event) => onQuestionChange(event.target.value)}
+            placeholder="Ask about VPN, access, email, hardware, or next steps"
+          />
+          <button type="submit" disabled={isAiLoading}>
+            Ask
+          </button>
+        </form>
+
+        {aiResponse ? (
+          <div className="ai-response-card">
+            <p>{aiResponse.reply}</p>
+            <ul>
+              {(aiResponse.suggestedActions ?? []).map((action) => (
+                <li key={action}>{action}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </article>
     </section>
   );
 }
@@ -766,7 +950,7 @@ function DashboardAnalyticsPanel({ dashboard, notifications, onMarkNotificationR
                   <strong>{notification.title}</strong>
                   <p>{notification.message}</p>
                   <small>
-                    {notification.type} · {formatDate(notification.createdAt)}
+                    {notification.type} - {formatDate(notification.createdAt)}
                   </small>
                 </div>
                 {!notification.isRead ? (
