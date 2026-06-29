@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5001/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+const HAS_API_BASE_URL = Boolean(API_BASE_URL);
 const STORAGE_KEY = "helpdesk_session";
 
 const demoAccounts = {
@@ -35,6 +36,10 @@ export function getStoredSession() {
 
 export async function login(credentials) {
   try {
+    if (!HAS_API_BASE_URL) {
+      throw new Error("API base URL is not configured.");
+    }
+
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
@@ -48,9 +53,7 @@ export async function login(credentials) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
       return session;
     }
-  } catch {
-    // The fallback below keeps the Assignment 2 frontend demo usable before the API is running.
-  }
+  } catch {}
 
   const account = demoAccounts[credentials.email.toLowerCase()];
 
@@ -73,4 +76,3 @@ export async function login(credentials) {
 export function logout() {
   localStorage.removeItem(STORAGE_KEY);
 }
-

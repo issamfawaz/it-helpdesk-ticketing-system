@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5001/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+const HAS_API_BASE_URL = Boolean(API_BASE_URL);
 const TICKETS_KEY = "helpdesk_demo_tickets";
 const COMMENTS_KEY = "helpdesk_demo_comments";
 const ACTIVITY_KEY = "helpdesk_demo_activity";
@@ -385,7 +386,156 @@ function buildDemoDashboard() {
   };
 }
 
+function detectDemoCategory(text) {
+  const normalized = text.toLowerCase();
+
+  if (["wifi", "wi-fi", "vpn", "internet", "network", "connection"].some((word) => normalized.includes(word))) {
+    return "Network";
+  }
+
+  if (["email", "outlook", "mailbox", "inbox"].some((word) => normalized.includes(word))) {
+    return "Email";
+  }
+
+  if (["password", "permission", "login", "access", "account"].some((word) => normalized.includes(word))) {
+    return "Access Request";
+  }
+
+  if (["laptop", "printer", "monitor", "mouse", "keyboard", "hardware"].some((word) => normalized.includes(word))) {
+    return "Hardware";
+  }
+
+  if (["software", "install", "application", "app", "crash", "error"].some((word) => normalized.includes(word))) {
+    return "Software";
+  }
+
+  return "Other";
+}
+
+function detectDemoPriority(text) {
+  const normalized = text.toLowerCase();
+
+  if (["server down", "outage", "all users", "production", "offline", "security breach"].some((word) => normalized.includes(word))) {
+    return "Critical";
+  }
+
+  if (["urgent", "cannot work", "blocked", "manager", "no access"].some((word) => normalized.includes(word))) {
+    return "High";
+  }
+
+  if (["install", "request", "question", "minor"].some((word) => normalized.includes(word))) {
+    return "Low";
+  }
+
+  return "Medium";
+}
+
+function buildDemoSuggestions(category, priority) {
+  const closingStep = priority === "Critical"
+    ? "Notify the support lead and document each action immediately."
+    : "Update the ticket status after each support action.";
+
+  const categorySteps = {
+    Network: ["Check Wi-Fi, VPN, adapter, and whether multiple users are affected.", "Escalate to the network team if the issue is widespread."],
+    Email: ["Test webmail before changing the Outlook profile.", "Check mailbox access, password state, and mail client errors."],
+    "Access Request": ["Verify user identity and manager approval.", "Check account lock status and assigned roles."],
+    Hardware: ["Ask for a photo or screenshot of the device issue.", "Check cables, power, drivers, and replacement availability."],
+    Software: ["Collect the exact error message and application version.", "Try restart, repair, or reinstall only after confirming impact."],
+    Other: ["Ask for clear reproduction steps.", "Collect screenshots, logs, and affected device details."]
+  };
+
+  return [...(categorySteps[category] ?? categorySteps.Other), closingStep];
+}
+
+function buildDemoAiAnalysis(payload) {
+  const text = `${payload.title ?? payload.Title ?? ""} ${payload.description ?? payload.Description ?? ""}`;
+  const category = detectDemoCategory(text);
+  const priority = detectDemoPriority(text);
+  const title = payload.title ?? payload.Title ?? "This ticket";
+
+  return {
+    suggestedCategory: category,
+    suggestedPriority: priority,
+    summary: `${title} appears to be a ${category} support request with ${priority} priority.`,
+    troubleshootingSuggestions: buildDemoSuggestions(category, priority),
+    explanation: `Detected ${category} indicators and estimated ${priority} priority from the ticket text.`,
+    confidence: priority === "Critical" ? 0.93 : 0.86
+  };
+}
+
+function buildReportCsv() {
+  const rows = ["TicketNumber,Title,Category,Priority,Status,AssignedTo,CreatedBy,UpdatedAt"];
+
+  for (const ticket of readDemoTickets()) {
+    rows.push([
+      ticket.ticketNumber,
+      `"${ticket.title.replaceAll("\"", "\"\"")}"`,
+      `"${ticket.category}"`,
+      `"${ticket.priority}"`,
+      `"${ticket.status}"`,
+      `"${ticket.assignedTo ?? "Unassigned"}"`,
+      `"${ticket.createdBy}"`,
+      `"${ticket.updatedAt}"`
+    ].join(","));
+  }
+
+  return rows.join("\n");
+}
+
+function buildReportHtml() {
+  const dashboard = buildDemoDashboard();
+  const rows = readDemoTickets()
+    .map((ticket) => `
+      <tr>
+        <td>${ticket.ticketNumber}</td>
+        <td>${ticket.title}</td>
+        <td>${ticket.category}</td>
+        <td>${ticket.priority}</td>
+        <td>${ticket.status}</td>
+        <td>${ticket.assignedTo ?? "Unassigned"}</td>
+      </tr>
+    `)
+    .join("");
+
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Helpdesk Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; color: #172033; margin: 32px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #d9e0ea; padding: 8px; text-align: left; font-size: 13px; }
+          th { background: #f5f7fb; }
+          .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+          .kpi { border: 1px solid #d9e0ea; padding: 12px; border-radius: 8px; }
+          .kpi span { display: block; color: #637083; font-size: 12px; }
+          .kpi strong { font-size: 26px; }
+        </style>
+      </head>
+      <body>
+        <h1>IT Helpdesk Ticket Report</h1>
+        <section class="kpis">
+          <article class="kpi"><span>Total Tickets</span><strong>${dashboard.totalTickets}</strong></article>
+          <article class="kpi"><span>Open</span><strong>${dashboard.openTickets}</strong></article>
+          <article class="kpi"><span>Pending</span><strong>${dashboard.pendingTickets}</strong></article>
+          <article class="kpi"><span>Resolved/Closed</span><strong>${dashboard.resolvedTickets}</strong></article>
+        </section>
+        <table>
+          <thead><tr><th>#</th><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Assigned</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
 async function apiRequest(path, options) {
+  if (!HAS_API_BASE_URL) {
+    throw new Error("API base URL is not configured.");
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, options);
 
   if (!response.ok) {
@@ -397,6 +547,20 @@ async function apiRequest(path, options) {
   }
 
   return response.json();
+}
+
+async function fileRequest(path, options) {
+  if (!HAS_API_BASE_URL) {
+    throw new Error("API base URL is not configured.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, options);
+
+  if (!response.ok) {
+    throw new Error(`File request failed with status ${response.status}.`);
+  }
+
+  return response.blob();
 }
 
 function updateStoredTicket(ticketId, updater) {
@@ -479,6 +643,62 @@ export async function getDashboardAnalytics(session) {
     });
   } catch {
     return buildDemoDashboard();
+  }
+}
+
+export async function exportReport(session, format) {
+  try {
+    const blob = await fileRequest(`/reports/export/${format}`, {
+      headers: {
+        Authorization: `Bearer ${session.token}`
+      }
+    });
+
+    return {
+      blob,
+      fileName: format === "excel" ? "helpdesk-report.csv" : "helpdesk-report.html",
+      format
+    };
+  } catch {
+    const isExcel = format === "excel";
+    return {
+      blob: new Blob([isExcel ? buildReportCsv() : buildReportHtml()], {
+        type: isExcel ? "text/csv" : "text/html"
+      }),
+      fileName: isExcel ? "helpdesk-report.csv" : "helpdesk-report.html",
+      format
+    };
+  }
+}
+
+export async function analyzeTicketDraft(session, payload) {
+  try {
+    return await apiRequest("/ai/analyze-ticket", {
+      method: "POST",
+      headers: authHeaders(session),
+      body: JSON.stringify({
+        title: payload.title,
+        description: payload.description
+      })
+    });
+  } catch {
+    return buildDemoAiAnalysis(payload);
+  }
+}
+
+export async function askAiAssistant(session, payload) {
+  try {
+    return await apiRequest("/ai/chat", {
+      method: "POST",
+      headers: authHeaders(session),
+      body: JSON.stringify(payload)
+    });
+  } catch {
+    const category = payload.category ?? detectDemoCategory(`${payload.ticketTitle ?? ""} ${payload.ticketDescription ?? ""} ${payload.message}`);
+    return {
+      reply: `This looks related to ${category}. Gather the impact, verify the user's environment, add evidence, and update the workflow after each support step.`,
+      suggestedActions: buildDemoSuggestions(category, "Medium")
+    };
   }
 }
 
@@ -585,6 +805,7 @@ export async function createTicket(session, payload) {
       createdBy: session.fullName,
       assignedTo: null,
       commentCount: 0,
+      attachmentCount: 0,
       lastActivity: `Ticket was created by ${session.fullName}.`,
       createdAt: now,
       updatedAt: now
