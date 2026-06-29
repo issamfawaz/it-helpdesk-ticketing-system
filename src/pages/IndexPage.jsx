@@ -24,7 +24,7 @@ const roleCards = {
     "Monitor team tickets",
     "Review pending work",
     "Track average resolution time",
-    "Export reports later"
+    "Export reports"
   ]
 };
 
@@ -35,7 +35,7 @@ export default function IndexPage({ session, onLogout }) {
     <main className="dashboard-page">
       <header className="topbar">
         <div>
-          <span className="eyebrow">Authenticated dashboard</span>
+          <span className="eyebrow">Helpdesk operations</span>
           <h1>Welcome, {session.fullName}</h1>
           <p>{session.email}</p>
         </div>
@@ -70,8 +70,8 @@ export default function IndexPage({ session, onLogout }) {
           <span className="eyebrow">Role-based authorization</span>
           <h2>{session.role} permissions</h2>
           <p>
-            This page demonstrates role-based UI behavior. The backend also has
-            matching authorization policies for Admin, Agent, Manager, and Employee access.
+            Access changes by role, so each user only sees the support actions that match
+            their responsibility inside the helpdesk workflow.
           </p>
         </div>
 

@@ -19,11 +19,11 @@ export default function LoginPage({ error, isLoading, onLogin }) {
   return (
     <main className="auth-page">
       <section className="auth-intro">
-        <span className="eyebrow">Assignment 2</span>
+        <span className="eyebrow">Enterprise helpdesk portal</span>
         <h1>IT Help Desk & Ticketing Management System</h1>
         <p>
-          Login page for JWT authentication and role-based access. Users are redirected
-          to the correct dashboard experience based on their role.
+          A role-based support workspace for employees, agents, managers, and administrators
+          to track tickets, attachments, reports, notifications, and AI-assisted triage.
         </p>
       </section>
 
@@ -80,4 +80,3 @@ export default function LoginPage({ error, isLoading, onLogin }) {
     </main>
   );
 }
-
