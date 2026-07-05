@@ -238,8 +238,13 @@ function authHeaders(session) {
 }
 
 function readStoredJson(key, fallback) {
-  const saved = localStorage.getItem(key);
-  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(fallback));
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(fallback));
+  } catch {
+    localStorage.removeItem(key);
+    return JSON.parse(JSON.stringify(fallback));
+  }
 }
 
 function writeStoredJson(key, value) {
@@ -284,6 +289,16 @@ function readDemoNotifications() {
 
 function writeDemoNotifications(notifications) {
   writeStoredJson(NOTIFICATIONS_KEY, notifications);
+}
+
+export function resetDemoData() {
+  [
+    TICKETS_KEY,
+    COMMENTS_KEY,
+    ACTIVITY_KEY,
+    ATTACHMENTS_KEY,
+    NOTIFICATIONS_KEY
+  ].forEach((key) => localStorage.removeItem(key));
 }
 
 function normalizeTicket(ticket) {
@@ -389,41 +404,239 @@ function buildDemoDashboard() {
 function detectDemoCategory(text) {
   const normalized = text.toLowerCase();
 
-  if (["wifi", "wi-fi", "vpn", "internet", "network", "connection"].some((word) => normalized.includes(word))) {
+  if (includesAny(normalized, [
+    "wifi",
+    "wi-fi",
+    "internet",
+    "vpn",
+    "network",
+    "connection",
+    "no connection",
+    "router",
+    "switch",
+    "ethernet",
+    "lan",
+    "dns",
+    "proxy",
+    "firewall",
+    "ip address",
+    "server",
+    "offline",
+    "outage"
+  ])) {
     return "Network";
   }
 
-  if (["email", "outlook", "mailbox", "inbox"].some((word) => normalized.includes(word))) {
+  if (includesAny(normalized, [
+    "email",
+    "e-mail",
+    "outlook",
+    "mailbox",
+    "inbox",
+    "calendar",
+    "meeting invite",
+    "smtp",
+    "imap",
+    "mail"
+  ])) {
     return "Email";
   }
 
-  if (["password", "permission", "login", "access", "account"].some((word) => normalized.includes(word))) {
+  if (includesAny(normalized, [
+    "password",
+    "permission",
+    "login",
+    "log in",
+    "sign in",
+    "signin",
+    "access",
+    "account locked",
+    "user account",
+    "compromised account",
+    "new account",
+    "locked",
+    "mfa",
+    "2fa",
+    "role",
+    "approval"
+  ])) {
     return "Access Request";
   }
 
-  if (["laptop", "printer", "monitor", "mouse", "keyboard", "hardware"].some((word) => normalized.includes(word))) {
+  if (includesAny(normalized, [
+    "laptop",
+    "desktop",
+    "pc",
+    "computer",
+    "printer",
+    "monitor",
+    "mouse",
+    "keyboard",
+    "scanner",
+    "headset",
+    "hardware",
+    "device",
+    "battery",
+    "charger",
+    "screen",
+    "blue screen"
+  ])) {
     return "Hardware";
   }
 
-  if (["software", "install", "application", "app", "crash", "error"].some((word) => normalized.includes(word))) {
+  if (includesAny(normalized, [
+    "software",
+    "install",
+    "application",
+    "app",
+    "program",
+    "crash",
+    "error",
+    "bug",
+    "license",
+    "update",
+    "version",
+    "excel",
+    "word",
+    "browser",
+    "chrome"
+  ])) {
     return "Software";
   }
 
   return "Other";
 }
 
+function includesAny(text, phrases) {
+  return phrases.some((phrase) => text.includes(phrase));
+}
+
 function detectDemoPriority(text) {
   const normalized = text.toLowerCase();
+  const broadImpact = includesAny(normalized, [
+    "all users",
+    "everyone",
+    "whole company",
+    "entire company",
+    "company-wide",
+    "department cannot",
+    "whole department",
+    "office cannot",
+    "whole office",
+    "entire office",
+    "multiple users",
+    "many users",
+    "staff cannot",
+    "team cannot"
+  ]);
+  const outageSignals = includesAny(normalized, [
+    "server down",
+    "server is down",
+    "main server",
+    "outage",
+    "production",
+    "offline",
+    "service down",
+    "system down",
+    "system offline",
+    "network down",
+    "internet down",
+    "no internet",
+    "wifi down",
+    "wi-fi down",
+    "email down",
+    "mail server down",
+    "database down",
+    "website down",
+    "application down"
+  ]);
+  const securitySignals = includesAny(normalized, [
+    "security breach",
+    "ransomware",
+    "data leak",
+    "hacked",
+    "phishing",
+    "malware",
+    "virus",
+    "compromised account",
+    "unauthorized access"
+  ]);
+  const blockedUserSignals = includesAny(normalized, [
+    "no internet",
+    "internet not working",
+    "network not working",
+    "wifi not working",
+    "wi-fi not working",
+    "cannot connect",
+    "can't connect",
+    "unable to connect",
+    "fails to connect",
+    "no connection",
+    "vpn not working",
+    "vpn failed",
+    "email down",
+    "outlook not working",
+    "cannot send email",
+    "cannot receive email",
+    "cannot login",
+    "can't login",
+    "cannot log in",
+    "can't log in",
+    "cannot sign in",
+    "can't sign in",
+    "cannot access",
+    "can't access",
+    "no access",
+    "account locked",
+    "locked out",
+    "laptop won't turn on",
+    "computer won't start",
+    "printer down",
+    "cannot print",
+    "cannot work",
+    "blocked",
+    "urgent"
+  ]);
+  const plannedOrLowSignals = includesAny(normalized, [
+    "install request",
+    "installation request",
+    "please install",
+    "install software",
+    "software request",
+    "access request",
+    "new user setup",
+    "new employee",
+    "minor",
+    "question",
+    "how do i",
+    "how to",
+    "can i",
+    "need software",
+    "need approved",
+    "when possible",
+    "not urgent",
+    "low priority"
+  ]);
 
-  if (["server down", "outage", "all users", "production", "offline", "security breach"].some((word) => normalized.includes(word))) {
+  if (
+    (broadImpact && outageSignals) ||
+    securitySignals ||
+    includesAny(normalized, [
+      "production server",
+      "main server is offline",
+      "main server down",
+      "company system down",
+      "critical system down"
+    ])
+  ) {
     return "Critical";
   }
 
-  if (["urgent", "cannot work", "blocked", "manager", "no access"].some((word) => normalized.includes(word))) {
+  if (blockedUserSignals) {
     return "High";
   }
 
-  if (["install", "request", "question", "minor"].some((word) => normalized.includes(word))) {
+  if (plannedOrLowSignals) {
     return "Low";
   }
 
@@ -432,19 +645,113 @@ function detectDemoPriority(text) {
 
 function buildDemoSuggestions(category, priority) {
   const closingStep = priority === "Critical"
-    ? "Notify the support lead and document each action immediately."
-    : "Update the ticket status after each support action.";
+    ? "Escalate to the support lead immediately and document the timeline."
+    : "Update the ticket status and add a customer-facing reply after each support step.";
 
   const categorySteps = {
-    Network: ["Check Wi-Fi, VPN, adapter, and whether multiple users are affected.", "Escalate to the network team if the issue is widespread."],
-    Email: ["Test webmail before changing the Outlook profile.", "Check mailbox access, password state, and mail client errors."],
-    "Access Request": ["Verify user identity and manager approval.", "Check account lock status and assigned roles."],
-    Hardware: ["Ask for a photo or screenshot of the device issue.", "Check cables, power, drivers, and replacement availability."],
-    Software: ["Collect the exact error message and application version.", "Try restart, repair, or reinstall only after confirming impact."],
-    Other: ["Ask for clear reproduction steps.", "Collect screenshots, logs, and affected device details."]
+    Network: [
+      "Confirm whether the network issue is isolated to one device, one floor, or multiple users.",
+      "Check Wi-Fi profile, VPN status, adapter state, and recent access point alerts.",
+      "If more than one user is affected, assign the ticket to Network Team."
+    ],
+    Email: [
+      "Test webmail first to separate account issues from Outlook profile issues.",
+      "Check password state, mailbox access, client errors, and recent policy changes.",
+      "If authentication fails across webmail and Outlook, route to Security Team."
+    ],
+    "Access Request": [
+      "Verify the employee identity and confirm manager approval before changing access.",
+      "Check account lock status, assigned roles, group membership, and recent permission changes.",
+      "Add an internal note with the approval source before resolving."
+    ],
+    Hardware: [
+      "Request a photo, screenshot, or asset tag before dispatching replacement hardware.",
+      "Check power, cables, drivers, device health, and whether a loaner is required.",
+      "Escalate to onsite support if the user is blocked from working."
+    ],
+    Software: [
+      "Collect the exact error message, application version, and reproduction steps.",
+      "Check whether the app is approved, licensed, and already installed on similar devices.",
+      "Try repair or reinstall only after confirming the impact and preserving user data."
+    ],
+    Other: [
+      "Ask for clear reproduction steps and the affected device or system.",
+      "Collect screenshots, logs, user impact, and deadline details.",
+      "Reclassify the ticket once enough evidence is collected."
+    ]
   };
 
   return [...(categorySteps[category] ?? categorySteps.Other), closingStep];
+}
+
+function buildDemoImpact(category, priority) {
+  const priorityPrefix = priority === "Critical"
+    ? "Business-critical impact"
+    : priority === "High"
+      ? "User is likely blocked or strongly affected"
+      : priority === "Low"
+        ? "Low operational impact"
+        : "Moderate support impact";
+
+  const categoryImpact = {
+    Network: "connectivity may prevent access to internal systems or cloud tools",
+    Email: "mailbox access may block communication and approvals",
+    "Access Request": "permissions may prevent the employee from completing assigned work",
+    Hardware: "device reliability may reduce or block productivity",
+    Software: "application availability may affect the requested workflow",
+    Other: "more information is needed before final routing"
+  };
+
+  return `${priorityPrefix}: ${categoryImpact[category] ?? categoryImpact.Other}.`;
+}
+
+function buildDemoOwner(category) {
+  const owners = {
+    Network: "Network Team",
+    Email: "Security Team",
+    "Access Request": "Helpdesk Admin",
+    Hardware: "Onsite Support",
+    Software: "IT Support",
+    Other: "Helpdesk Triage"
+  };
+
+  return owners[category] ?? owners.Other;
+}
+
+function findDemoEvidence(text) {
+  const normalized = text.toLowerCase();
+  const indicators = [
+    "wifi",
+    "wi-fi",
+    "vpn",
+    "network",
+    "email",
+    "outlook",
+    "password",
+    "access",
+    "laptop",
+    "printer",
+    "software",
+    "install",
+    "urgent",
+    "blocked",
+    "server",
+    "outage",
+    "security breach",
+    "ransomware",
+    "phishing",
+    "malware",
+    "no internet",
+    "cannot access",
+    "account locked",
+    "cannot connect",
+    "cannot login",
+    "cannot print",
+    "not working",
+    "offline"
+  ];
+
+  return indicators.filter((indicator) => normalized.includes(indicator)).slice(0, 5);
 }
 
 function buildDemoAiAnalysis(payload) {
@@ -452,14 +759,32 @@ function buildDemoAiAnalysis(payload) {
   const category = detectDemoCategory(text);
   const priority = detectDemoPriority(text);
   const title = payload.title ?? payload.Title ?? "This ticket";
+  const evidence = findDemoEvidence(text);
+  const recommendedOwner = buildDemoOwner(category);
+  const troubleshootingSuggestions = buildDemoSuggestions(category, priority);
+  const confidence = priority === "Critical" ? 0.94 : evidence.length >= 2 ? 0.9 : 0.82;
 
   return {
     suggestedCategory: category,
     suggestedPriority: priority,
-    summary: `${title} appears to be a ${category} support request with ${priority} priority.`,
-    troubleshootingSuggestions: buildDemoSuggestions(category, priority),
-    explanation: `Detected ${category} indicators and estimated ${priority} priority from the ticket text.`,
-    confidence: priority === "Critical" ? 0.93 : 0.86
+    recommendedOwner,
+    summary: `The request "${title}" should be handled as a ${category} ticket with ${priority} priority. Assign ownership to ${recommendedOwner}, collect evidence, and keep the ticket updated until the user confirms the issue is resolved.`,
+    impact: buildDemoImpact(category, priority),
+    urgencyReason: priority === "Critical"
+      ? "Critical because the language suggests a possible service outage or company-wide impact."
+      : priority === "High"
+        ? "High because the ticket suggests the user may be blocked from normal work."
+        : priority === "Low"
+          ? "Low because the request appears planned or non-blocking."
+          : "Medium because the issue needs support action but does not show outage-level impact.",
+    troubleshootingSuggestions,
+    nextActions: troubleshootingSuggestions,
+    escalationNote: priority === "Critical" || priority === "High"
+      ? `Escalate to ${recommendedOwner} if the first validation step confirms the impact.`
+      : `Keep ownership with ${recommendedOwner} unless new evidence shows broader impact.`,
+    evidence: evidence.length > 0 ? evidence : ["No strong keyword evidence; collect more details from the requester"],
+    explanation: `Detected ${category} routing signals and estimated ${priority} urgency from the ticket title and description.`,
+    confidence
   };
 }
 
@@ -695,9 +1020,11 @@ export async function askAiAssistant(session, payload) {
     });
   } catch {
     const category = payload.category ?? detectDemoCategory(`${payload.ticketTitle ?? ""} ${payload.ticketDescription ?? ""} ${payload.message}`);
+    const priority = detectDemoPriority(`${payload.ticketTitle ?? ""} ${payload.ticketDescription ?? ""} ${payload.message}`);
+    const owner = buildDemoOwner(category);
     return {
-      reply: `This looks related to ${category}. Gather the impact, verify the user's environment, add evidence, and update the workflow after each support step.`,
-      suggestedActions: buildDemoSuggestions(category, "Medium")
+      reply: `Recommended handling: classify this as ${category}, keep priority around ${priority}, and route ownership to ${owner}. Start by confirming impact, collecting evidence, and posting a clear user-facing update.`,
+      suggestedActions: buildDemoSuggestions(category, priority)
     };
   }
 }
