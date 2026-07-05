@@ -3,7 +3,6 @@ import {
   addTicketComment,
   analyzeTicketDraft,
   assignTicket,
-  askAiAssistant,
   createTicket,
   deleteTicket,
   exportReport,
@@ -58,9 +57,10 @@ export default function TicketManagementPage({ session }) {
   const [workflowMessage, setWorkflowMessage] = useState("");
   const [reportMessage, setReportMessage] = useState("");
   const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [aiQuestion, setAiQuestion] = useState("");
-  const [aiResponse, setAiResponse] = useState(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [ticketSearch, setTicketSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [priorityFilter, setPriorityFilter] = useState("All");
 
   const canManageTickets = ["Admin", "IT Support Agent"].includes(session.role);
 
@@ -123,6 +123,42 @@ export default function TicketManagementPage({ session }) {
     };
   }, [tickets]);
 
+  const filteredTickets = useMemo(() => {
+    const searchValue = ticketSearch.trim().toLowerCase();
+
+    return tickets.filter((ticket) => {
+      const matchesStatus = statusFilter === "All" || ticket.status === statusFilter;
+      const matchesPriority = priorityFilter === "All" || ticket.priority === priorityFilter;
+      const searchableText = [
+        ticket.ticketNumber,
+        ticket.title,
+        ticket.description,
+        ticket.category,
+        ticket.priority,
+        ticket.status,
+        ticket.assignedTo,
+        ticket.createdBy
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return matchesStatus && matchesPriority && (!searchValue || searchableText.includes(searchValue));
+    });
+  }, [priorityFilter, statusFilter, ticketSearch, tickets]);
+
+  useEffect(() => {
+    if (filteredTickets.length === 0) {
+      return;
+    }
+
+    const selectedTicketIsVisible = filteredTickets.some((ticket) => ticket.id === selectedTicketId);
+
+    if (!selectedTicketIsVisible) {
+      setSelectedTicketId(filteredTickets[0].id);
+    }
+  }, [filteredTickets, selectedTicketId]);
+
   async function refreshDashboardData() {
     const [nextDashboard, nextNotifications] = await Promise.all([
       getDashboardAnalytics(session),
@@ -184,6 +220,7 @@ export default function TicketManagementPage({ session }) {
 
   function resetForm() {
     setEditingTicketId(null);
+    setAiAnalysis(null);
     setForm({
       ...emptyForm,
       categoryId: categories[0]?.id ?? ""
@@ -394,42 +431,6 @@ export default function TicketManagementPage({ session }) {
     setIsAiLoading(false);
   }
 
-  async function handleAnalyzeSelectedTicket() {
-    if (!selectedTicket) {
-      return;
-    }
-
-    setIsAiLoading(true);
-    const analysis = await analyzeTicketDraft(session, {
-      title: selectedTicket.title,
-      description: selectedTicket.description
-    });
-
-    setAiAnalysis(analysis);
-    setWorkflowMessage("AI ticket summary generated.");
-    setIsAiLoading(false);
-  }
-
-  async function handleAskAiAssistant(event) {
-    event.preventDefault();
-
-    if (!aiQuestion.trim()) {
-      return;
-    }
-
-    setIsAiLoading(true);
-    const response = await askAiAssistant(session, {
-      message: aiQuestion,
-      ticketTitle: selectedTicket?.title,
-      ticketDescription: selectedTicket?.description,
-      category: selectedTicket?.category
-    });
-
-    setAiResponse(response);
-    setAiQuestion("");
-    setIsAiLoading(false);
-  }
-
   function formatDate(value) {
     return new Intl.DateTimeFormat("en", {
       month: "short",
@@ -452,11 +453,11 @@ export default function TicketManagementPage({ session }) {
   }
 
   return (
-    <section className="ticket-workspace">
+    <section className="ticket-workspace" id="helpdesk-dashboard">
       <div className="ticket-header">
         <div>
-          <span className="eyebrow">Dashboard analytics and support operations</span>
-          <h2>Ticket Management</h2>
+          <span className="eyebrow">Support operations</span>
+          <h2>Support Tickets</h2>
           <p>
             Track KPIs, upload attachments, review notifications, assign tickets, update statuses,
             and audit support activity from one helpdesk workspace.
@@ -470,29 +471,7 @@ export default function TicketManagementPage({ session }) {
         </div>
       </div>
 
-      {dashboard ? (
-        <DashboardAnalyticsPanel
-          dashboard={dashboard}
-          notifications={notifications}
-          onMarkNotificationRead={handleMarkNotificationRead}
-          formatDate={formatDate}
-        />
-      ) : null}
-
-      <ReportsAndAiPanel
-        aiAnalysis={aiAnalysis}
-        aiQuestion={aiQuestion}
-        aiResponse={aiResponse}
-        isAiLoading={isAiLoading}
-        reportMessage={reportMessage}
-        selectedTicket={selectedTicket}
-        onAnalyzeSelectedTicket={handleAnalyzeSelectedTicket}
-        onAskAiAssistant={handleAskAiAssistant}
-        onExportReport={handleExportReport}
-        onQuestionChange={setAiQuestion}
-      />
-
-      <div className="ticket-grid">
+      <div className="ticket-grid" id="tickets">
         <form className="ticket-form" onSubmit={handleSubmit}>
           <h3>{editingTicketId ? "Edit ticket" : "Create ticket"}</h3>
 
@@ -574,9 +553,17 @@ export default function TicketManagementPage({ session }) {
 
           {message ? <p className="form-message">{message}</p> : null}
 
+          {aiAnalysis ? (
+            <div className="ai-suggestion-card">
+              <span>AI suggestion</span>
+              <strong>{aiAnalysis.suggestedCategory} / {aiAnalysis.suggestedPriority}</strong>
+              <p>Applied to the ticket form. The support agent can still change it before saving.</p>
+            </div>
+          ) : null}
+
           <div className="form-actions">
-            <button className="secondary-button" type="button" onClick={handleAnalyzeDraft}>
-              AI analyze
+            <button className="secondary-button" type="button" onClick={handleAnalyzeDraft} disabled={isAiLoading}>
+              {isAiLoading ? "Analyzing..." : "Suggest category"}
             </button>
             <button type="submit">{editingTicketId ? "Update ticket" : "Create ticket"}</button>
             {editingTicketId ? (
@@ -587,75 +574,111 @@ export default function TicketManagementPage({ session }) {
           </div>
         </form>
 
-        <div className="ticket-table-panel">
-          <div className="table-title-row">
-            <h3>Tickets</h3>
-            <span>{tickets.length} total</span>
-          </div>
+        <div className="ticket-operations-column">
+          <section className="ticket-table-panel">
+            <div className="table-title-row">
+              <div>
+                <span className="eyebrow">Ticket queue</span>
+                <h3>Active support requests</h3>
+              </div>
+              <span>{filteredTickets.length} shown / {tickets.length} total</span>
+            </div>
 
-          <div className="responsive-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ticket</th>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Assigned</th>
-                  <th>Files</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr className={ticket.id === selectedTicket?.id ? "selected-row" : ""} key={ticket.id}>
-                    <td>#{ticket.ticketNumber}</td>
-                    <td>{ticket.title}</td>
-                    <td>{ticket.category}</td>
-                    <td>
-                      <span className={`priority-tag ${ticket.priority.toLowerCase()}`}>
-                        {ticket.priority}
-                      </span>
-                    </td>
-                    <td>{ticket.status}</td>
-                    <td>{ticket.assignedTo ?? "Unassigned"}</td>
-                    <td>{ticket.attachmentCount ?? 0}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button
-                          className="secondary-action"
-                          type="button"
-                          onClick={() => setSelectedTicketId(ticket.id)}
-                        >
-                          Workflow
-                        </button>
-                        {canManageTickets ? (
-                          <>
-                            <button type="button" onClick={() => startEdit(ticket)}>
-                              Edit
-                            </button>
-                            <button
-                              className="danger-button"
-                              type="button"
-                              onClick={() => handleDelete(ticket.id)}
-                            >
-                              Delete
-                            </button>
-                          </>
-                        ) : (
-                          <span className="muted-text">View only</span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+            <div className="ticket-toolbar">
+              <input
+                value={ticketSearch}
+                onChange={(event) => setTicketSearch(event.target.value)}
+                placeholder="Search ticket number, title, assignee, category, or status"
+              />
+              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <option value="All">All statuses</option>
+                {statuses.map((status) => (
+                  <option value={status} key={status}>
+                    {status}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </select>
+              <select value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)}>
+                <option value="All">All priorities</option>
+                {priorities.map((priority) => (
+                  <option value={priority} key={priority}>
+                    {priority}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="responsive-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned</th>
+                    <th>Files</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTickets.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="empty-table-cell">
+                        No tickets match the current search.
+                      </td>
+                    </tr>
+                  ) : null}
+                  {filteredTickets.map((ticket) => (
+                    <tr className={ticket.id === selectedTicket?.id ? "selected-row" : ""} key={ticket.id}>
+                      <td>#{ticket.ticketNumber}</td>
+                      <td>{ticket.title}</td>
+                      <td>{ticket.category}</td>
+                      <td>
+                        <span className={`priority-tag ${ticket.priority.toLowerCase()}`}>
+                          {ticket.priority}
+                        </span>
+                      </td>
+                      <td>{ticket.status}</td>
+                      <td>{ticket.assignedTo ?? "Unassigned"}</td>
+                      <td>{ticket.attachmentCount ?? 0}</td>
+                      <td>
+                        <div className="table-actions">
+                          <button
+                            className="secondary-action"
+                            type="button"
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                          >
+                            View
+                          </button>
+                          {canManageTickets ? (
+                            <>
+                              <button type="button" onClick={() => startEdit(ticket)}>
+                                Edit
+                              </button>
+                              <button
+                                className="danger-button"
+                                type="button"
+                                onClick={() => handleDelete(ticket.id)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          ) : (
+                            <span className="muted-text">View only</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
 
           {selectedTicket ? (
-            <div className="workflow-panel">
+            <aside className="workflow-panel">
               <div className="workflow-header">
                 <div>
                   <span className="eyebrow">Selected ticket #{selectedTicket.ticketNumber}</span>
@@ -806,28 +829,34 @@ export default function TicketManagementPage({ session }) {
                   )}
                 </div>
               </div>
-            </div>
+            </aside>
           ) : null}
         </div>
       </div>
+
+      {dashboard ? (
+        <DashboardAnalyticsPanel
+          dashboard={dashboard}
+          notifications={notifications}
+          onMarkNotificationRead={handleMarkNotificationRead}
+          formatDate={formatDate}
+        />
+      ) : null}
+
+      <ReportsPanel
+        reportMessage={reportMessage}
+        onExportReport={handleExportReport}
+      />
     </section>
   );
 }
 
-function ReportsAndAiPanel({
-  aiAnalysis,
-  aiQuestion,
-  aiResponse,
-  isAiLoading,
+function ReportsPanel({
   reportMessage,
-  selectedTicket,
-  onAnalyzeSelectedTicket,
-  onAskAiAssistant,
-  onExportReport,
-  onQuestionChange
+  onExportReport
 }) {
   return (
-    <section className="reports-ai-panel">
+    <section className="reports-panel" id="reports">
       <article className="report-tools-card">
         <div>
           <span className="eyebrow">Reports</span>
@@ -842,56 +871,6 @@ function ReportsAndAiPanel({
           </button>
         </div>
         {reportMessage ? <p className="form-message">{reportMessage}</p> : null}
-      </article>
-
-      <article className="ai-tools-card">
-        <div className="ai-tools-header">
-          <div>
-            <span className="eyebrow">AI support assistant</span>
-            <h3>{selectedTicket ? `Ticket #${selectedTicket.ticketNumber}` : "Ticket helper"}</h3>
-          </div>
-          <button type="button" onClick={onAnalyzeSelectedTicket} disabled={!selectedTicket || isAiLoading}>
-            AI summary
-          </button>
-        </div>
-
-        {aiAnalysis ? (
-          <div className="ai-result-card">
-            <div className="ai-result-meta">
-              <span>{aiAnalysis.suggestedCategory}</span>
-              <span>{aiAnalysis.suggestedPriority}</span>
-              <span>{Math.round(aiAnalysis.confidence * 100)}%</span>
-            </div>
-            <p>{aiAnalysis.summary}</p>
-            <ul>
-              {(aiAnalysis.troubleshootingSuggestions ?? []).map((suggestion) => (
-                <li key={suggestion}>{suggestion}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        <form className="ai-chat-form" onSubmit={onAskAiAssistant}>
-          <input
-            value={aiQuestion}
-            onChange={(event) => onQuestionChange(event.target.value)}
-            placeholder="Ask about VPN, access, email, hardware, or next steps"
-          />
-          <button type="submit" disabled={isAiLoading}>
-            Ask
-          </button>
-        </form>
-
-        {aiResponse ? (
-          <div className="ai-response-card">
-            <p>{aiResponse.reply}</p>
-            <ul>
-              {(aiResponse.suggestedActions ?? []).map((action) => (
-                <li key={action}>{action}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
       </article>
     </section>
   );
