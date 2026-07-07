@@ -37,6 +37,20 @@ const emptyCommentForm = {
 const priorities = ["Low", "Medium", "High", "Critical"];
 const statuses = ["Open", "In Progress", "Pending", "Resolved", "Closed"];
 const allowedAttachmentTypes = [".png", ".jpg", ".jpeg", ".pdf", ".txt", ".doc", ".docx"];
+const prioritySortRank = {
+  Critical: 0,
+  High: 1,
+  Medium: 2,
+  Low: 3
+};
+const statusSortRank = {
+  Open: 0,
+  "In Progress": 1,
+  Pending: 2,
+  Resolved: 3,
+  Closed: 4
+};
+const doneStatuses = new Set(["Resolved", "Closed"]);
 
 export default function TicketManagementPage({ session }) {
   const [tickets, setTickets] = useState([]);
@@ -126,25 +140,51 @@ export default function TicketManagementPage({ session }) {
   const filteredTickets = useMemo(() => {
     const searchValue = ticketSearch.trim().toLowerCase();
 
-    return tickets.filter((ticket) => {
-      const matchesStatus = statusFilter === "All" || ticket.status === statusFilter;
-      const matchesPriority = priorityFilter === "All" || ticket.priority === priorityFilter;
-      const searchableText = [
-        ticket.ticketNumber,
-        ticket.title,
-        ticket.description,
-        ticket.category,
-        ticket.priority,
-        ticket.status,
-        ticket.assignedTo,
-        ticket.createdBy
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+    return tickets
+      .filter((ticket) => {
+        const matchesStatus = statusFilter === "All" || ticket.status === statusFilter;
+        const matchesPriority = priorityFilter === "All" || ticket.priority === priorityFilter;
+        const searchableText = [
+          ticket.ticketNumber,
+          ticket.title,
+          ticket.description,
+          ticket.category,
+          ticket.priority,
+          ticket.status,
+          ticket.assignedTo,
+          ticket.createdBy
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
 
-      return matchesStatus && matchesPriority && (!searchValue || searchableText.includes(searchValue));
-    });
+        return matchesStatus && matchesPriority && (!searchValue || searchableText.includes(searchValue));
+      })
+      .sort((firstTicket, secondTicket) => {
+        const firstDone = doneStatuses.has(firstTicket.status) ? 1 : 0;
+        const secondDone = doneStatuses.has(secondTicket.status) ? 1 : 0;
+
+        if (firstDone !== secondDone) {
+          return firstDone - secondDone;
+        }
+
+        const priorityDifference =
+          (prioritySortRank[firstTicket.priority] ?? 99) - (prioritySortRank[secondTicket.priority] ?? 99);
+
+        if (priorityDifference !== 0) {
+          return priorityDifference;
+        }
+
+        const statusDifference =
+          (statusSortRank[firstTicket.status] ?? 99) - (statusSortRank[secondTicket.status] ?? 99);
+
+        if (statusDifference !== 0) {
+          return statusDifference;
+        }
+
+        return new Date(secondTicket.updatedAt ?? secondTicket.createdAt).getTime() -
+          new Date(firstTicket.updatedAt ?? firstTicket.createdAt).getTime();
+      });
   }, [priorityFilter, statusFilter, ticketSearch, tickets]);
 
   useEffect(() => {
@@ -630,8 +670,17 @@ export default function TicketManagementPage({ session }) {
                       </td>
                     </tr>
                   ) : null}
-                  {filteredTickets.map((ticket) => (
-                    <tr className={ticket.id === selectedTicket?.id ? "selected-row" : ""} key={ticket.id}>
+                  {filteredTickets.map((ticket) => {
+                    const isDoneTicket = doneStatuses.has(ticket.status);
+                    const rowClassName = [
+                      ticket.id === selectedTicket?.id ? "selected-row" : "",
+                      isDoneTicket ? "ticket-row-done" : ""
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
+
+                    return (
+                    <tr className={rowClassName} key={ticket.id}>
                       <td>#{ticket.ticketNumber}</td>
                       <td>{ticket.title}</td>
                       <td>{ticket.category}</td>
@@ -640,7 +689,11 @@ export default function TicketManagementPage({ session }) {
                           {ticket.priority}
                         </span>
                       </td>
-                      <td>{ticket.status}</td>
+                      <td>
+                        <span className={`table-status-tag ${ticket.status.toLowerCase().replaceAll(" ", "-")}`}>
+                          {ticket.status}
+                        </span>
+                      </td>
                       <td>{ticket.assignedTo ?? "Unassigned"}</td>
                       <td>{ticket.attachmentCount ?? 0}</td>
                       <td>
@@ -671,7 +724,8 @@ export default function TicketManagementPage({ session }) {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
