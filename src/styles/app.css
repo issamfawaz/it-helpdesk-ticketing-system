@@ -2663,6 +2663,68 @@ body {
   text-align: right;
 }
 
+.table-status-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #536174;
+  font-size: 11px;
+  font-weight: 850;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.table-status-tag.open {
+  background: #eef6ff;
+  color: #1f5f9f;
+}
+
+.table-status-tag.in-progress {
+  background: #f2f5f8;
+  color: #344154;
+}
+
+.table-status-tag.pending {
+  background: #fff7ed;
+  color: #9a5b13;
+}
+
+.table-status-tag.resolved {
+  background: #edf8f3;
+  color: #16784f;
+}
+
+.table-status-tag.closed {
+  background: #f1f3f5;
+  color: #667085;
+}
+
+.ticket-table-panel .ticket-row-done td {
+  color: #7b8794;
+  background: #fbfcfd;
+}
+
+.ticket-table-panel .ticket-row-done td:nth-child(2) {
+  color: #7b8794;
+  text-decoration: line-through;
+  text-decoration-color: #9aa6b2;
+}
+
+.ticket-table-panel .ticket-row-done .priority-tag {
+  background: #f1f3f5;
+  color: #7b8794;
+}
+
+.ticket-table-panel tbody .ticket-row-done:hover td {
+  background: #f7f9fb;
+}
+
+.ticket-table-panel .selected-row.ticket-row-done td {
+  background: #f4f8fb;
+}
+
 @media (max-width: 1180px) {
   .analytics-layout {
     grid-template-columns: 1fr;
