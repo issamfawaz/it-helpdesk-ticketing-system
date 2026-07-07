@@ -810,25 +810,30 @@ export default function TicketManagementPage({ session }) {
                       ))
                     )}
                   </div>
-
-                  <h4>Activity history</h4>
-                  {isWorkflowLoading ? (
-                    <p className="muted-text">Loading ticket history...</p>
-                  ) : (
-                    <div className="activity-list">
-                      {activity.map((item) => (
-                        <article className="activity-item" key={item.id}>
-                          <span>{item.action}</span>
-                          <p>{item.description}</p>
-                          <small>
-                            {item.actor} - {formatDate(item.createdAt)}
-                          </small>
-                        </article>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
+
+              <section className="activity-history-panel">
+                <div className="section-title-row">
+                  <h4>Activity history</h4>
+                  <span>{activity.length} events</span>
+                </div>
+                {isWorkflowLoading ? (
+                  <p className="muted-text">Loading ticket history...</p>
+                ) : (
+                  <div className="activity-list">
+                    {activity.map((item) => (
+                      <article className="activity-item" key={item.id}>
+                        <span>{item.action}</span>
+                        <p>{item.description}</p>
+                        <small>
+                          {item.actor} - {formatDate(item.createdAt)}
+                        </small>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
             </aside>
           ) : null}
         </div>

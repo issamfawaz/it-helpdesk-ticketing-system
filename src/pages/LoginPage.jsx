@@ -7,6 +7,13 @@ const demoUsers = [
   ["Admin", "admin@company.com", "Admin123!"]
 ];
 
+const productHighlights = [
+  "Role-based access",
+  "Ticket workflow",
+  "Reports export",
+  "AI triage"
+];
+
 export default function LoginPage({ error, isLoading, onLogin }) {
   const [email, setEmail] = useState("issam.fawaz@company.com");
   const [password, setPassword] = useState("Employee123!");
@@ -25,10 +32,18 @@ export default function LoginPage({ error, isLoading, onLogin }) {
           A role-based support workspace for employees, agents, managers, and administrators
           to track tickets, attachments, reports, notifications, and AI-assisted triage.
         </p>
+        <div className="auth-feature-grid">
+          {productHighlights.map((highlight) => (
+            <span key={highlight}>{highlight}</span>
+          ))}
+        </div>
       </section>
 
       <section className="login-panel">
-        <h2>Sign in</h2>
+        <div>
+          <span className="eyebrow">Secure access</span>
+          <h2>Sign in</h2>
+        </div>
         <form onSubmit={handleSubmit} className="login-form">
           <label>
             Email address
